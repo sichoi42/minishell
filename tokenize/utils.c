@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../minishell.h"
 #include "stdlib.h"
 
 int	ft_strlen(char *s)

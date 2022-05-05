@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../minishell.h"
 #include <stdlib.h>
 
 // WORD 토큰화.

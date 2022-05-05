@@ -1,4 +1,5 @@
-// 사용되는 토큰
+
+// 사용되는 token
 enum Token
 {
 	T_WORD, T_QUOTE = '\'', T_DQUOTE = '\"', T_DOLLAR = '$',
@@ -10,6 +11,7 @@ enum Token
 	T_STAR = '*'
 };
 
+// 토큰의 type
 enum Type
 {
 	REDIRECT,
@@ -18,15 +20,32 @@ enum Type
 	STAR
 };
 
+// parse tree의 type
+enum Tree_type
+{
+	TREE_PIPE, TREE_RE, TREE_CMD
+};
+
 // 각 토큰들을 linked list로 저장.
 typedef struct	s_token
 {
 	char			*s;
 	enum Token		token;
 	enum Type		type;
-	struct s_token	*prev;
 	struct s_token	*next;
 }	t_token;
+
+typedef struct s_ast
+{
+	t_token			*token;
+	struct s_ast	*left;
+	struct s_ast	*right;
+	struct s_ast	*root;
+	enum Tree_type	tree_type;
+	int				pipe_cnt;
+}	t_ast;
+
+// in tokenize
 
 // utils.c
 int	ft_strlen(char *s);
@@ -43,3 +62,14 @@ t_token	*split_one_elem(char *s, int *i);
 enum Token	get_redirect_token(char *s, int *i);
 t_token	*split_redirect(char *s, int *i);
 int	ft_tsplit(t_token *t, char *s);
+
+// in parsing
+
+// parsing.c
+int	syntax_pipe(t_ast *node, t_token *t, t_ast *root);
+int	syntax_bundle(t_ast *node, t_token *t);
+int	syntax_redirect(t_ast *node, t_token *t);
+void	syntax_decision_redirect(t_ast *node, t_token *t);
+int	syntax_cmd(t_ast *node, t_token *t);
+void	parsing(t_ast *tree, t_token *token_header);
+void	tree_searching(t_ast *tree);
