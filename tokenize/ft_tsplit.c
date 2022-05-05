@@ -1,9 +1,33 @@
 #include "utils.h"
 #include <stdlib.h>
 
-int	get_quote_token(char *s, int *i, int *sq_cnt, int *dq_cnt) // single인지 double quote인지에 따라 해당 토큰을 반환.
+// WORD 토큰화.
+// line중 word에 해당하는 토큰 생성.
+t_token	*split_word(char *s, int *i)
 {
-	int	token;
+	int			j;
+	t_token		*new;
+
+	new = malloc(sizeof(t_token));
+	if (new == NULL)
+		return (NULL);
+	new->next = NULL;
+	new->token = T_WORD;
+	new->type = ARGS;
+	j = *i;
+	while (*(s + *i) && *(s + *i) != ' ')
+		++(*i);
+	new->s = ft_strndup(s + j, *i - j);
+	if (new->s == NULL)
+		return (NULL);
+	return (new);
+}
+
+// QUOTE, DQUOTE 토큰화.
+// single인지 double quote인지에 따라 해당 토큰을 반환.
+enum Token	get_quote_token(char *s, int *i, int *sq_cnt, int *dq_cnt)
+{
+	enum Token token;
 
 	if (s[*i] == T_QUOTE)
 	{
@@ -18,9 +42,9 @@ int	get_quote_token(char *s, int *i, int *sq_cnt, int *dq_cnt) // single인지 d
 	return (token);
 }
 
-t_token	*split_quote(char *s, int *i, int *sq_cnt, int *dq_cnt) // line중 single quote와 double quote로 감싸진 word를 생성.
+// line중 single quote와 double quote로 감싸진 token 생성.
+t_token	*split_quote(char *s, int *i, int *sq_cnt, int *dq_cnt)
 {
-	int			token;
 	int			j;
 	t_token		*new;
 
@@ -29,6 +53,7 @@ t_token	*split_quote(char *s, int *i, int *sq_cnt, int *dq_cnt) // line중 singl
 		return (NULL);
 	new->next = NULL;
 	new->token = get_quote_token(s, i, sq_cnt, dq_cnt);
+	new->type = ARGS;
 	++(*i);
 	j = *i;
 	while (*(s + *i) && *(s + *i) != new->token)
@@ -47,7 +72,31 @@ t_token	*split_quote(char *s, int *i, int *sq_cnt, int *dq_cnt) // line중 singl
 	return (new);
 }
 
-t_token	*split_one_elem(char *s, int *i) // line중 한글자로 이루어진 token(|, $, *)을 생성.
+// line중 $로 시작하는 token 생성.
+t_token	*split_dollar(char *s, int *i)
+{
+	int		j;
+	t_token	*new;
+
+	new = malloc(sizeof(t_token));
+	if (new == NULL)
+		return (NULL);
+	new->next = NULL;
+	new->token = T_DOLLAR;
+	new->type = ARGS;
+	++(*i);
+	j = *i;
+	while (*(s + *i) && *(s + *i) != ' ')
+		++(*i);
+	new->s = ft_strndup(s + j, *i - j);
+	if (new->s == NULL)
+		return (NULL);
+	return (new);
+}
+
+// PIPE, STAR 토큰화.
+// line중 한글자로 이루어진 token(|, *)을 생성.
+t_token	*split_one_elem(char *s, int *i)
 {
 	t_token		*new;
 
@@ -56,11 +105,15 @@ t_token	*split_one_elem(char *s, int *i) // line중 한글자로 이루어진 to
 		return (NULL);
 	new->next = NULL;
 	if (s[*i] == T_PIPE)
+	{
 		new->token = T_PIPE;
-	else if (s[*i] == T_DOLLAR)
-		new->token = T_DOLLAR;
+		new->type = PIPE;
+	}
 	else
+	{
 		new->token = T_STAR;
+		new->type = STAR;
+	}
 	new->s = ft_strndup(&s[*i], 1);
 	if(new->s == NULL)
 		return (NULL);
@@ -68,9 +121,11 @@ t_token	*split_one_elem(char *s, int *i) // line중 한글자로 이루어진 to
 	return (new);
 }
 
-int	get_redirect_token(char *s, int *i) // 어떤 리다이렉션인지에 따라 해당 토큰을 반환.
+// 리다이렉션들 토큰화.
+// 어떤 리다이렉션인지에 따라 해당 토큰을 반환.
+enum Token	get_redirect_token(char *s, int *i)
 {
-	int	token;
+	enum Token token;
 
 	if (s[*i] == '>')
 	{
@@ -96,9 +151,9 @@ int	get_redirect_token(char *s, int *i) // 어떤 리다이렉션인지에 따�
 	return (token);
 }
 
-t_token	*split_redirect(char *s, int *i) // line중 리다이렉션에 해당하는 토큰 생성.
+// line중 리다이렉션에 해당하는 토큰 생성.
+t_token	*split_redirect(char *s, int *i)
 {
-	int		token;
 	int		j;
 	t_token	*new;
 
@@ -106,8 +161,8 @@ t_token	*split_redirect(char *s, int *i) // line중 리다이렉션에 해당하
 	if (new == NULL)
 		return (NULL);
 	new->next = NULL;
-	token = get_redirect_token(s, i);
-	new->token = token;
+	new->token = get_redirect_token(s, i);
+	new->type = REDIRECT;
 	while (s[*i] && s[*i] == ' ')
 		++(*i);
 	j = *i;
@@ -115,25 +170,6 @@ t_token	*split_redirect(char *s, int *i) // line중 리다이렉션에 해당하
 		++(*i);
 	new->s = ft_strndup(s + j, *i - j);
 	if(new->s == NULL)
-		return (NULL);
-	return (new);
-}
-
-t_token	*split_word(char *s, int *i) // line중 word에 해당하는 토큰 생성.
-{
-	int			j;
-	t_token		*new;
-
-	new = malloc(sizeof(t_token));
-	if (new == NULL)
-		return (NULL);
-	new->next = NULL;
-	new->token = T_WORD;
-	j = *i;
-	while (*(s + *i) && *(s + *i) != ' ')
-		++(*i);
-	new->s = ft_strndup(s + j, *i - j);
-	if (new->s == NULL)
 		return (NULL);
 	return (new);
 }
@@ -156,8 +192,10 @@ int	ft_tsplit(t_token *t, char *s)
 			++i;
 		if (*(s + i) == T_QUOTE || *(s + i) == T_DQUOTE)
 			new = split_quote(s, &i, &sq_cnt, &dq_cnt); // ', "
-		else if (*(s + i) == T_PIPE || *(s + i) == T_DOLLAR || *(s + i) == T_STAR)
-			new = split_one_elem(s, &i); // |, $, *
+		else if (*(s + i) == T_DOLLAR)
+			new = split_dollar(s, &i);
+		else if (*(s + i) == T_PIPE || *(s + i) == T_STAR)
+			new = split_one_elem(s, &i); // |, *
 		else if (*(s + i) == '>' || *(s + i) == '<')
 			new = split_redirect(s, &i); // >, <, >>, <<
 		else

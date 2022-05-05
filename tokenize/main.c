@@ -26,7 +26,8 @@
 int main(int argc, char **argv)
 {
 	char *s = argv[1];
-	argc = argc;
+	if (argc != 2)
+		return (1);
 	t_token	token_header; // token 리스트의 헤더.
 
 	token_header.prev = NULL;
@@ -40,7 +41,9 @@ int main(int argc, char **argv)
 	{
 		printf("%s\n", p->s);
 		printf("%s\n", get_token_str(p->token));
+		printf("%s\n", get_type_str(p->type));
 		printf("-----------------\n");
 		p = p->next;
 	}
+	return (0);
 }
