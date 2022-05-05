@@ -6,22 +6,28 @@
 // ex
 // >> "ls -al > a | grep abc"  (readline 함수에서 명령어를 한 문자열을 받는 것을 고려하여 전체를 한 문자열로 묶어서 전달해야함.)
 // ls
-// WORD
+// token: T_WORD
+// type: ARGS
 // ----------
 // -al
-// WORD
+// token: T_WORD
+// type: ARGS
 // ----------
 // a
-// RE_OUTPUT
+// token: T_RE_OUTPUT
+// type: REDIRECT
 // ----------
 // |
-// PIPE
+// token: T_PIPE
+// type: PIPE
 // ----------
 // grep
-// WORD
+// token: WORD
+// type: ARGS
 // ----------
 // abc
-// WORD
+// token: WORD
+// type: ARGS
 // ----------
 int main(int argc, char **argv)
 {
@@ -40,8 +46,8 @@ int main(int argc, char **argv)
 	while (p)
 	{
 		printf("%s\n", p->s);
-		printf("%s\n", get_token_str(p->token));
-		printf("%s\n", get_type_str(p->type));
+		printf("token: %s\n", get_token_str(p->token));
+		printf("type: %s\n", get_type_str(p->type));
 		printf("-----------------\n");
 		p = p->next;
 	}
