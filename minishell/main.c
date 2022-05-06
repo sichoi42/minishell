@@ -288,6 +288,16 @@ int	search_env(t_envs *e, char *key)
 	return (-1);
 }
 
+char	*get_env_value(t_envs *e, char *key)
+{
+	int	i;
+
+	i = search_env(e, key);
+	if (i == -1)
+		return (NULL);
+	return (e->envs[i]->value);
+}
+
 static void	insert_new_env(t_envs *e, char *key, char *value)
 {
 	e->envs[e->size] = malloc(sizeof(t_env));
@@ -304,7 +314,29 @@ static void	insert_new_env(t_envs *e, char *key, char *value)
 	e->size += 1;
 }
 
+int	check_key(char *key)
+{
+	if (*key >= '0' && *key <= '9')
+		return (1);
+	while (*key != '\0')
+	{
+		if (*key == '_')
+			;
+		else if (*key >= 'a' && *key <= 'z')
+			;
+		else if (*key >= 'A' && *key <= 'Z')
+			;
+		else if (*key >= '0' && *key <= '9')
+			;
+		else
+			return (1);
+		++key;
+	}
+	return (0);
+}
+
 /*
+ * insert_env에 들어오기 전 key와 value를 check해야한다.check_key() 함수 사용.
  * key, value는 malloc된 값이 들어온다고 가정
  */
 
@@ -319,7 +351,7 @@ int	insert_env(t_envs *e, char *key, char *value)
 		{
 			e->capa *= 2;
 			e->envs = (t_env **)ft_realloc(e->envs, sizeof(t_env *) * e->size,
-				e->capa);
+					e->capa);
 		}
 		insert_new_env(e, key, value);
 	}
@@ -343,7 +375,6 @@ int	delete_env(t_envs *e, char *key)
 		return (1);
 	free(e->envs[index]->key);
 	free(e->envs[index]->value);
-	// NULL값을 참조하는 형태가 된다.
 	if (e->envs[index]->l != NULL)
 		e->envs[index]->l->r = e->envs[index]->r;
 	else
@@ -362,57 +393,9 @@ int	delete_env(t_envs *e, char *key)
 int main(int argc, char *argv[], char *env[])
 {
 	t_envs	e;
-	t_envs	*temp;
-	char	**key;
-	char	**value;
-	int		i;
 
 	if (input_env(&e, env) == 1)
 		return (1);
-	/* insert_env test
-	insert_env(&e, "USER", NULL);
-	key = malloc(sizeof(char *) * 7);
-	i = -1;
-	while (++i < 7)
-	{
-		key[i] = malloc(sizeof(char) * 2);
-		key[i][0] = 'a' + i;
-		key[i][1] = '\0';
-	}
-	value = malloc(sizeof(char *) * 7);
-	i = -1;
-	while (++i < 5)
-	{
-		value[i] = malloc(sizeof(char) * 2);
-		value[i][0] = 'a' + i;
-		value[i][1] = '\0';
-	}
-	value[5] = NULL;
-	value[6] = NULL;
-	i = -1;
-	while (++i < 7)
-		insert_env(&e, key[i], value[i]);
-	insert_env(&e, "1", "1");
-	insert_env(&e, "2", "1");
-	insert_env(&e, "3", "1");
-	insert_env(&e, "4", "1");
-	insert_env(&e, "5", "1");
-	insert_env(&e, "6", "1");
-	insert_env(&e, "7", "1");
-	insert_env(&e, "USER", "swi2");
-	printf("%d:%d\n", e.capa, e.size);
-	*/
-	/* delete_env test
-	delete_env(&e, "SHELL");
-	delete_env(&e, "PWD");
-	delete_env(&e, "SHLVL");
-	delete_env(&e, "TERM");
-	delete_env(&e, "__CF_USER_TEXT_ENCODING");
-	delete_env(&e, "sdjfk");
-	delete_env(&e, "COLORFGBG");
-	*/
-	//print_env(&e);
-	print_export(&e);
 	free_envs(&e, AFT_KEY_SET);
 	return (0);
 }
