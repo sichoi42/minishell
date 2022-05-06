@@ -11,7 +11,7 @@
 # include <errno.h>
 # include <stdlib.h>
 
-# define SIZE 128
+# define SIZE 2
 
 /*
  * key: 환경변수의 key
@@ -23,12 +23,12 @@
  */
 
 typedef struct s_env {
-	char	*key;
-	char	*value;
-	int		l;
-	int		r;
-	int		k_len;
-	int		v_len;
+	char			*key;
+	char			*value;
+	struct s_env	*l;
+	struct s_env	*r;
+	int				k_len;
+	int				v_len;
 }	t_env;
 
 /*
@@ -50,8 +50,8 @@ typedef struct s_env {
 typedef struct s_envs {
 	char	**env;
 	t_env	**envs;
-	int		first;
-	int		last;
+	t_env	*first;
+	t_env	*last;
 	int		capa;
 	int		size;
 }	t_envs;
@@ -65,6 +65,6 @@ void	*ft_realloc(void *ptr, int ptr_size, int new_size);
 int		ft_strlen(char *str);
 int		ft_strlen_c(char *str, char c);
 int		ft_strlcpy(char *str, char *target, int len);
-int		ft_strlcmp(char *l, char *r, int len);
+int		ft_strcmp(char *l, char *r);
 
 #endif

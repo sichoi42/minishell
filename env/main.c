@@ -8,7 +8,7 @@ void	*ft_realloc(void *ptr, int ptr_size, int new_size)
 
 	temp = (char *)malloc(new_size);
 	if (temp == NULL)
-		return (NULL);
+		exit(1);
 	cp_ptr = (char *)ptr;
 	i = -1;
 	while (++i < ptr_size)
@@ -126,55 +126,70 @@ int	ft_strlcpy(char *src, char *target, int len)
  * 같으면 0
  */
 
-int	ft_strlcmp(char *l, char *r, int len)
+int	ft_strcmp(char *l, char *r)
 {
-	int	i;
-
-	if (len == -1)
+	while (*l != '\0')
 	{
-		while (*l != '\0')
-		{
-			if (*l++ != *r++)
-				break ;
-		}
-		return (*l - *r);
+		if (*l != *r)
+			break ;
+		++l;
+		++r;
 	}
-	else
+	return (*l - *r);
+}
+
+void	print_export(t_envs *e)
+{
+	t_env	*env;
+
+	env = e->first;
+	while (env != NULL)
 	{
-		i = -1;
-		while (++i < len && *l != '\0')
+		if (ft_strcmp("_", env->key) != 0)
 		{
-			if (*l++ != *r++)
-				break ;
+			if (env->v_len != -1)
+				printf("declare -x %s=\"%s\"\n", env->key, env->value);
+			else
+				printf("declare -x %s\n", env->key);
 		}
-		if (i == len)
-			return (0);
-		return (*l - *r);
+		env = env->r;
+	}
+}
+
+void	print_env(t_envs *e)
+{
+	int i;
+
+	i = -1;
+	while (++i < e->size)
+	{
+		if (e->envs[i]->v_len != -1)
+			printf("%s=%s\n", e->envs[i]->key, e->envs[i]->value);
 	}
 }
 
 void	find_env_r(t_envs *e, char *key, int last)
 {
 	int	i;
-	int	bef;
+	t_env	*bef;
 
 	i = -1;
-	while (++i < last && e->envs[last]->r == -1)
+	while (++i < last && e->envs[last]->r == NULL)
 	{
-		if (ft_strlcmp(e->envs[i]->key, key, -1) > 0)
+		if (ft_strcmp(e->envs[i]->key, key) > 0)
 		{
 			bef = e->envs[i]->l;
-			if (bef != -1 && ft_strlcmp(e->envs[bef]->key, key, -1) < 0)
+			if (bef != NULL && ft_strcmp(bef->key, key) < 0)
 			{
-				e->envs[last]->r = i;
+				e->envs[last]->r = e->envs[i];
 				e->envs[last]->l = bef;
-				e->envs[bef]->r = last;
-				e->envs[i]->l = last;
+				bef->r = e->envs[last];
+				e->envs[i]->l = e->envs[last];
 			}
-			else if (bef == -1)
+			else if (bef == NULL)
 			{
-				e->envs[last]->r = i;
-				e->envs[i]->l = last;
+				e->envs[last]->r = e->envs[i];
+				e->envs[i]->l = e->envs[last];
 			}
 		}
 	}
@@ -183,25 +198,25 @@ void	find_env_r(t_envs *e, char *key, int last)
 void	find_env_l(t_envs *e, char *key, int last)
 {
 	int	i;
-	int	next;
+	t_env	*next;
 
 	i = -1;
-	while (++i < last && e->envs[last]->l == -1)
+	while (++i < last && e->envs[last]->l == NULL)
 	{
-		if (ft_strlcmp(e->envs[i]->key, key, -1) < 0)
+		if (ft_strcmp(e->envs[i]->key, key) < 0)
 		{
-			next = e->envs[i]->l;
-			if (next != -1 && ft_strlcmp(e->envs[next]->key, key, -1) > 0)
+			next = e->envs[i]->r;
+			if (next != NULL && ft_strcmp(next->key, key) > 0)
 			{
 				e->envs[last]->r = next;
-				e->envs[last]->l = i;
-				e->envs[next]->l = last;
-				e->envs[i]->r = last;
+				e->envs[last]->l = e->envs[i];
+				next->l = e->envs[last];
+				e->envs[i]->r = e->envs[last];
 			}
-			else if (next == -1)
+			else if (next == NULL)
 			{
-				e->envs[last]->l = i;
-				e->envs[i]->r = last;
+				e->envs[last]->l = e->envs[i];
+				e->envs[i]->r = e->envs[last];
 			}
 		}
 	}
@@ -216,39 +231,32 @@ void	find_env_l(t_envs *e, char *key, int last)
 
 void	set_env_lr(t_envs *e, char *key, int index)
 {
-	e->envs[index]->l = -1;
-	e->envs[index]->r = -1;
-	find_env_r(e, e->envs[index]->key, index);
-	find_env_l(e, e->envs[index]->key, index);
+	e->envs[index]->l = NULL;
+	e->envs[index]->r = NULL;
+	find_env_r(e, key, index);
+	find_env_l(e, key, index);
+	if (e->envs[index]->l == NULL)
+		e->first = e->envs[index];
+	if (e->envs[index]->r == NULL)
+		e->last = e->envs[index];
 }
 
-void	set_envs(t_envs *e)
+void	init_envs(t_envs *e)
 {
 	int	i;
-	int	j;
-	int	n;
-	int	b;
-	char	*tmp;
 
 	i = -1;
 	while (++i < e->size)
 	{
 		ft_strlcpy(e->env[i], e->envs[i]->key, e->envs[i]->k_len);
 		set_env_lr(e, e->envs[i]->key, i);
-		ft_strlcpy(e->env[i] + e->envs[i]->k_len + 2,
+		ft_strlcpy(e->env[i] + e->envs[i]->k_len + 1,
 			e->envs[i]->value, e->envs[i]->v_len);
 	}
-	// 제일 작은 환경변수 e->first
-	// 제일 큰 환경변수 e->last
-	// 를 찾아주는 로직 작성해야함.
-	// + 환경변수 출력 함수를 만들어서 위의 로직 검증해야함.
-	// 아직 순서를 맞춰주는 로직은 확인하지 못함.
 }
 
 int	input_env(t_envs *e, char *env[])
 {
-	int	i;
-
 	e->env = env;
 	e->size = -1;
 	while (env[++(e->size)] != NULL)
@@ -256,7 +264,6 @@ int	input_env(t_envs *e, char *env[])
 	e->capa = SIZE;
 	while (e->capa <= e->size)
 		e->capa *= 2;
-	i = -1;
 	e->envs = malloc(sizeof(t_env *) * e->capa);
 	if (e->envs == NULL)
 		return (1);
@@ -264,16 +271,148 @@ int	input_env(t_envs *e, char *env[])
 		return (1);
 	if (envs_element_alloc(e, 0, e->size) == 1)
 		return (1);
-	set_envs(e);
+	init_envs(e);
+	return (0);
+}
+
+int	search_env(t_envs *e, char *key)
+{
+	int	i;
+
+	i = -1;
+	while (++i < e->size)
+	{
+		if (ft_strcmp(key, e->envs[i]->key) == 0)
+			return (i);
+	}
+	return (-1);
+}
+
+static void	insert_new_env(t_envs *e, char *key, char *value)
+{
+	e->envs[e->size] = malloc(sizeof(t_env));
+	if (e->envs[e->size] == NULL)
+		exit(1);
+	e->envs[e->size]->key = key;
+	e->envs[e->size]->k_len = ft_strlen(key);
+	set_env_lr(e, key, e->size);
+	e->envs[e->size]->value = value;
+	if (value == NULL)
+		e->envs[e->size]->v_len = -1;
+	else
+		e->envs[e->size]->v_len = ft_strlen(value);
+	e->size += 1;
+}
+
+/*
+ * key, value는 malloc된 값이 들어온다고 가정
+ */
+
+int	insert_env(t_envs *e, char *key, char *value)
+{
+	int	index;
+
+	index = search_env(e, key);
+	if (index == -1)
+	{
+		if (e->capa == e->size + 1)
+		{
+			e->capa *= 2;
+			e->envs = (t_env **)ft_realloc(e->envs, sizeof(t_env *) * e->size,
+				e->capa);
+		}
+		insert_new_env(e, key, value);
+	}
+	else
+	{
+		if (value == NULL)
+			return (0);
+		free(e->envs[index]->value);
+		e->envs[index]->value = value;
+		e->envs[index]->v_len = ft_strlen(value);
+	}
+	return (0);
+}
+
+int	delete_env(t_envs *e, char *key)
+{
+	int	index;
+
+	index = search_env(e, key);
+	if (index == -1)
+		return (1);
+	free(e->envs[index]->key);
+	free(e->envs[index]->value);
+	// NULL값을 참조하는 형태가 된다.
+	if (e->envs[index]->l != NULL)
+		e->envs[index]->l->r = e->envs[index]->r;
+	else
+		e->first = e->envs[index]->r;
+	if (e->envs[index]->r != NULL)
+		e->envs[index]->r->l = e->envs[index]->l;
+	else
+		e->last = e->envs[index]->l;
+	free(e->envs[index]);
+	if (index != e->size - 1)
+		e->envs[index] = e->envs[e->size - 1];
+	e->size -= 1;
 	return (0);
 }
 
 int main(int argc, char *argv[], char *env[])
 {
 	t_envs	e;
+	t_envs	*temp;
+	char	**key;
+	char	**value;
+	int		i;
 
 	if (input_env(&e, env) == 1)
 		return (1);
+	/* insert_env test
+	insert_env(&e, "USER", NULL);
+	key = malloc(sizeof(char *) * 7);
+	i = -1;
+	while (++i < 7)
+	{
+		key[i] = malloc(sizeof(char) * 2);
+		key[i][0] = 'a' + i;
+		key[i][1] = '\0';
+	}
+	value = malloc(sizeof(char *) * 7);
+	i = -1;
+	while (++i < 5)
+	{
+		value[i] = malloc(sizeof(char) * 2);
+		value[i][0] = 'a' + i;
+		value[i][1] = '\0';
+	}
+	value[5] = NULL;
+	value[6] = NULL;
+	i = -1;
+	while (++i < 7)
+		insert_env(&e, key[i], value[i]);
+	insert_env(&e, "1", "1");
+	insert_env(&e, "2", "1");
+	insert_env(&e, "3", "1");
+	insert_env(&e, "4", "1");
+	insert_env(&e, "5", "1");
+	insert_env(&e, "6", "1");
+	insert_env(&e, "7", "1");
+	insert_env(&e, "USER", "swi2");
+	printf("%d:%d\n", e.capa, e.size);
+	*/
+	/* delete_env test
+	delete_env(&e, "SHELL");
+	delete_env(&e, "PWD");
+	delete_env(&e, "SHLVL");
+	delete_env(&e, "TERM");
+	delete_env(&e, "__CF_USER_TEXT_ENCODING");
+	delete_env(&e, "sdjfk");
+	delete_env(&e, "COLORFGBG");
+	*/
+	//print_env(&e);
+	print_export(&e);
 	free_envs(&e, AFT_KEY_SET);
 	return (0);
 }
