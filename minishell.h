@@ -23,7 +23,7 @@ enum Type
 // parse tree의 type
 enum Tree_type
 {
-	TREE_PIPE, TREE_RE, TREE_CMD
+	TREE_PIPE, TREE_BUNDLE, TREE_RE, TREE_CMD
 };
 
 // 각 토큰들을 linked list로 저장.
@@ -52,6 +52,7 @@ int	ft_strlen(char *s);
 char	*ft_strndup(char *src, int len);
 char	*get_token_str(enum Token token);
 char	*get_type_str(enum Type type);
+void	print_token_list(t_token *t);
 
 // ft_tsplit.c
 t_token	*split_word(char *s, int *i);
@@ -73,3 +74,7 @@ void	syntax_decision_redirect(t_ast *node, t_token *t);
 int	syntax_cmd(t_ast *node, t_token *t);
 void	parsing(t_ast *tree, t_token *token_header);
 void	tree_searching(t_ast *tree);
+
+// utils.c
+t_token	*ft_token_dup(t_token *src);
+char	*get_tree_type_str(enum Tree_type tree_type);

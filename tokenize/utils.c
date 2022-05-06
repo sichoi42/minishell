@@ -1,5 +1,6 @@
 #include "../minishell.h"
-#include "stdlib.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 int	ft_strlen(char *s)
 {
@@ -75,4 +76,19 @@ char	*get_type_str(enum Type type)
 	else if (type == STAR)
 		s = "STAR";
 	return (s);
+}
+
+void	print_token_list(t_token *t)
+{
+	t_token	*p;
+
+	p = t;
+	while (p)
+	{
+		printf("%s\n", p->s);
+		printf("token: %s\n", get_token_str(p->token));
+		printf("type: %s\n", get_type_str(p->type));
+		printf("-----------------\n");
+		p = p->next;
+	}
 }

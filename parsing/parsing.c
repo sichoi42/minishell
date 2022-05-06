@@ -27,6 +27,9 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 			node->left = malloc(sizeof(t_ast));
 			if (node->left == NULL)
 				return (-1);
+			node->left->left = NULL;
+			node->left->right = NULL;
+			node->left->tree_type = TREE_BUNDLE;
 		}
 		if (syntax_bundle(node->left, t) == -1)
 			return (-1);
@@ -99,7 +102,7 @@ int	syntax_redirect(t_ast *node, t_token *t)
 
 void	syntax_decision_redirect(t_ast *node, t_token *t)
 {
-	node->token = t;
+	node->token = ft_token_dup(t);
 	if (t->token == T_RE_OUTPUT)
 		;
 	else if (t->token == T_RE_INPUT)
@@ -115,17 +118,13 @@ int	syntax_cmd(t_ast *node, t_token *t)
 	t_token	*p;
 
 	if (node->token == NULL)
-	{
-		node->token = t; // 메모리를 복사하지 않고 가르키기만 했음. 추후 문제 생길 수 있으니 주의.
-		node->token->next = NULL;
-	}
+		node->token = ft_token_dup(t); // 메모리를 복사.
 	else
 	{
 		p = node->token;
 		while (p->next)
 			p = p->next;
-		p->next = t;
-		p->next->next = NULL; // 메모리를 복사하지 않고 가르키기만 했음. 추후 문제 생길 수 있으니 주의.
+		p->next = ft_token_dup(t);
 	}
 	return (0);
 }
@@ -147,12 +146,13 @@ void	execute_something(t_ast *node)
 {
 	t_token	*t;
 
+	printf("tree_type: %s\n", get_tree_type_str(node->tree_type));
 	if (node->token != NULL)
 	{
 		t = node->token;
 		if (node->tree_type == TREE_CMD)
 		{
-			while (t->next)
+			while (t)
 			{
 				printf("%s ", t->s);
 				t = t->next;
@@ -161,7 +161,10 @@ void	execute_something(t_ast *node)
 		}
 		else
 			printf("%s\n", t->s);
+		printf("token: %s\n", get_token_str(node->token->token));
+		printf("type: %s\n", get_type_str(node->token->type));
 	}
+	printf("------------------\n");
 }
 
 void	tree_searching(t_ast *node)

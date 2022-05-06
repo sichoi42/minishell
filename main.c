@@ -1,4 +1,4 @@
-#include "../minishell.h"
+#include "minishell.h"
 #include <stddef.h>
 #include <stdio.h>
 
@@ -32,7 +32,6 @@
 int main(int argc, char **argv)
 {
 	char	*s;
-	t_token	*p;
 	t_token	token_header; // token 리스트의 헤더.
 	t_ast	tree;
 
@@ -43,15 +42,7 @@ int main(int argc, char **argv)
 	s = argv[1];
 	if (ft_tsplit(&token_header, s) == -1)
 		return (1);
-	p = token_header.next;
-	while (p)
-	{
-		printf("%s\n", p->s);
-		printf("token: %s\n", get_token_str(p->token));
-		printf("type: %s\n", get_type_str(p->type));
-		printf("-----------------\n");
-		p = p->next;
-	}
+	// print_token_list(token_header.next);
 	tree.token = NULL;
 	tree.left = NULL;
 	tree.right = NULL;
