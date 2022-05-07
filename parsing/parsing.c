@@ -18,7 +18,7 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 		node->right->left = NULL;
 		node->right->right = NULL;
 		node->right->tree_type = TREE_PIPE;
-		node->right->token = t;
+		node->right->token = ft_token_dup(t);
 	}
 	else
 	{
@@ -29,6 +29,7 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 				return (-1);
 			node->left->left = NULL;
 			node->left->right = NULL;
+			node->left->token = NULL;
 			node->left->tree_type = TREE_BUNDLE;
 		}
 		if (syntax_bundle(node->left, t) == -1)
@@ -48,6 +49,7 @@ int	syntax_bundle(t_ast *node, t_token *t)
 				return (-1);
 			node->right->left = NULL;
 			node->right->right = NULL;
+			node->right->token = NULL;
 			node->right->tree_type = TREE_CMD;
 		}
 		if (syntax_cmd(node->right, t) == -1);
@@ -61,6 +63,7 @@ int	syntax_bundle(t_ast *node, t_token *t)
 				return (-1);
 			node->left->left = NULL;
 			node->left->right = NULL;
+			node->left->token = NULL;
 			node->left->tree_type = TREE_RE;
 		}
 		syntax_redirect(node->left, t);
@@ -77,6 +80,7 @@ int	syntax_redirect(t_ast *node, t_token *t)
 			return (-1);
 		node->left->left = NULL;
 		node->left->right = NULL;
+		node->left->token = NULL;
 		node->left->tree_type = TREE_RE;
 		syntax_decision_redirect(node->left, t);
 	}
@@ -91,6 +95,7 @@ int	syntax_redirect(t_ast *node, t_token *t)
 					return (-1);
 				node->right->left = NULL;
 				node->right->right = NULL;
+				node->right->token = NULL;
 				node->right->tree_type = TREE_RE;
 			}
 			if (syntax_redirect(node->right, t) == -1)
@@ -174,4 +179,16 @@ void	tree_searching(t_ast *node)
 		tree_searching(node->left);
 	if (node->right != NULL)
 		tree_searching(node->right);
+}
+
+void	free_tree(t_ast	*node)
+{
+	if (node)
+	{
+		free_tree(node->left);
+		free_tree(node->right);
+		free_token(node->token);
+		free(node);
+		node = NULL;
+	}
 }

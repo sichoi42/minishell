@@ -12,7 +12,7 @@ t_token	*ft_token_dup(t_token *src)
 		return (NULL);
 	dst->token = src->token;
 	dst->type = src->type;
-	dst->s = src->s;
+	dst->s = ft_strndup(src->s, ft_strlen(src->s));
 	dst->next = NULL;
 	return (dst);
 }

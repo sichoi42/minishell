@@ -18,13 +18,13 @@ enum e_type
 	PIPE,
 	ARGS,
 	STAR
-};
+}	t_type;
 
 // parse tree의 type
 enum e_tree_type
 {
 	TREE_PIPE, TREE_BUNDLE, TREE_RE, TREE_CMD
-};
+}	t_tree_type;
 
 // 각 토큰들을 linked list로 저장.
 typedef struct	s_token
@@ -53,6 +53,7 @@ char	*ft_strndup(char *src, int len);
 char	*get_token_str(enum e_token token);
 char	*get_type_str(enum e_type type);
 void	print_token_list(t_token *t);
+void	free_token(t_token *t);
 
 // ft_tsplit.c
 t_token	*split_word(char *s, int *i);
@@ -74,6 +75,7 @@ void	syntax_decision_redirect(t_ast *node, t_token *t);
 int	syntax_cmd(t_ast *node, t_token *t);
 void	parsing(t_ast *tree, t_token *token_header);
 void	tree_searching(t_ast *tree);
+void	free_tree(t_ast	*node);
 
 // utils.c
 t_token	*ft_token_dup(t_token *src);

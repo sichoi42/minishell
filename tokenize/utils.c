@@ -92,3 +92,30 @@ void	print_token_list(t_token *t)
 		p = p->next;
 	}
 }
+
+void	free_token(t_token *t)
+{
+	t_token	*p;
+	t_token	*tmp;
+
+	if (t)
+	{
+		p = t;
+		while (p)
+		{
+			if (p->next)
+			{
+				tmp = p->next;
+				free(p->s);
+				free(p);
+				p = tmp;
+			}
+			else
+			{
+				free(p->s);
+				free(p);
+			}
+			p = p->next;
+		}
+	}
+}
