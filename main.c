@@ -40,11 +40,13 @@
 void	handler(int signum)
 {
 	if (signum == SIGINT)
+	{
 		write(STDOUT_FILENO, "\n", 1);
-	if (rl_on_new_line() == -1)
-		exit(1);
-	rl_replace_line("", 1);
-	rl_redisplay();
+		if (rl_on_new_line() == -1)
+			exit(1);
+		rl_replace_line("", 1);
+		rl_redisplay();
+	}
 }
 
 void	init_term(void)
@@ -91,7 +93,7 @@ int main(int argc, char **argv)
 	argv = argv;
 	init_term();
 	signal(SIGINT, handler);
-	signal(SIGQUIT, handler);
+	signal(SIGQUIT, SIG_IGN);
 	while (true)
 	{
 		line = readline("minishell> ");
