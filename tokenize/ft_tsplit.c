@@ -25,9 +25,9 @@ t_token	*split_word(char *s, int *i)
 
 // QUOTE, DQUOTE 토큰화.
 // single인지 double quote인지에 따라 해당 토큰을 반환.
-enum Token	get_quote_token(char *s, int *i, int *sq_cnt, int *dq_cnt)
+enum e_token	get_quote_token(char *s, int *i, int *sq_cnt, int *dq_cnt)
 {
-	enum Token token;
+	enum e_token token;
 
 	if (s[*i] == T_QUOTE)
 	{
@@ -123,9 +123,9 @@ t_token	*split_one_elem(char *s, int *i)
 
 // 리다이렉션들 토큰화.
 // 어떤 리다이렉션인지에 따라 해당 토큰을 반환.
-enum Token	get_redirect_token(char *s, int *i)
+enum e_token	get_redirect_token(char *s, int *i)
 {
-	enum Token token;
+	enum e_token token;
 
 	if (s[*i] == '>')
 	{

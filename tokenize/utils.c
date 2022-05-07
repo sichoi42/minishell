@@ -36,7 +36,7 @@ char	*ft_strndup(char *src, int len)
 	return (dst);
 }
 
-char	*get_token_str(enum Token token)
+char	*get_token_str(enum e_token token)
 {
 	char	*s;
 
@@ -63,7 +63,7 @@ char	*get_token_str(enum Token token)
 	return (s);
 }
 
-char	*get_type_str(enum Type type)
+char	*get_type_str(enum e_type type)
 {
 	char	*s;
 

@@ -18,7 +18,7 @@ t_token	*ft_token_dup(t_token *src)
 }
 
 // TREE_PIPE, TREE_BUNDLE, TREE_RE, TREE_CMD
-char	*get_tree_type_str(enum Tree_type tree_type)
+char	*get_tree_type_str(enum e_tree_type tree_type)
 {
 	char	*s;
 
