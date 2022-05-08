@@ -1,23 +1,31 @@
+#define OK 0
+#define ERROR 1
+#define WRONG_ACTION 2
 
-// 사용되는 token
+// 사용되는 토큰
 enum e_token
 {
-	T_WORD, T_QUOTE = '\'', T_DQUOTE = '\"', T_DOLLAR = '$',
-	T_RE_INPUT, // <
-	T_RE_OUTPUT, // >
-	T_RE_HEREDOC, // <<
-	T_RE_APPEND_OUTPUT, // >>
-	T_PIPE = '|',
-	T_STAR = '*'
+	T_INIT = 1,
+	T_WORD = 1 << 1,
+	T_QUOTE = 1 << 2,
+	T_DQUOTE = 1 << 3,
+	T_DOLLAR = 1 << 4,
+	T_RE_INPUT = 1 << 5,
+	T_RE_OUTPUT = 1 << 6,
+	T_RE_HEREDOC = 1 << 7,
+	T_RE_APPEND_OUTPUT = 1 << 8,
+	T_PIPE = 1 << 9,
+	T_STAR = 1 << 10
 };
 
 // 토큰의 type
 enum e_type
 {
-	REDIRECT,
-	PIPE,
-	ARGS,
-	STAR
+	INIT = 1,
+	REDIRECT = 1 << 1,
+	PIPE = 1 << 2,
+	ARGS = 1 << 3,
+	STAR = 1 << 4
 }	t_type;
 
 // parse tree의 type
@@ -29,53 +37,76 @@ enum e_tree_type
 // 각 토큰들을 linked list로 저장.
 typedef struct	s_token
 {
-	char				*s;
-	enum e_token		token;
-	enum e_type			type;
-	struct s_token		*next;
+	char				*s; // 담긴 문자열
+	enum e_token		token; // 토큰
+	enum e_type			type; // 토큰의 타입
+	struct s_token		*next; // 토큰에 연결된 다음 노드
 }	t_token;
 
 typedef struct s_ast
 {
-	t_token				*token;
-	struct s_ast		*left;
-	struct s_ast		*right;
-	struct s_ast		*root;
-	enum e_tree_type	tree_type;
-	int					pipe_cnt;
+	t_token				*token; // 토큰 구조체
+	struct s_ast		*left; // 왼쪽 자식
+	struct s_ast		*right; // 오른쪽 자식
+	struct s_ast		*root; // 루트 노드 정보
+	enum e_tree_type	tree_type; // 트리의 타입
+	int					pipe_cnt; // 파이프 개수
 }	t_ast;
 
-// in tokenize
+typedef	struct s_command
+{
+	char	*cmd;
+	char	*path;
+	char	**args;
+}	t_command;
+
+typedef struct s_redirect
+{
+	int		type;
+	char	*file_name;
+}	t_redirect;
 
 // utils.c
 int	ft_strlen(char *s);
 char	*ft_strndup(char *src, int len);
-char	*get_token_str(enum e_token token);
-char	*get_type_str(enum e_type type);
+int	is_space(char c);
+char	*ft_strchr(char *s, int c);
+
+// in tokenize
+
+// utils.c
+void	print_token_str(enum e_token token);
+void	print_type_str(enum e_type type);
 void	print_token_list(t_token *t);
 void	free_token(t_token *t);
 
-// ft_tsplit.c
-t_token	*split_word(char *s, int *i);
-enum e_token	get_quote_token(char *s, int *i, int *sq_cnt, int *dq_cnt);
-t_token	*split_quote(char *s, int *i, int *sq_cnt, int *dq_cnt);
-t_token	*split_dollar(char *s, int *i);
-t_token	*split_one_elem(char *s, int *i);
-enum e_token	get_redirect_token(char *s, int *i);
-t_token	*split_redirect(char *s, int *i);
-int	ft_tsplit(t_token *t, char *s);
+// tokenize.c
+int is_space(char c);
+int is_redirection(char c);
+int is_pipe(char c);
+int is_star(char c);
+int	is_quote(char c);
+char	*find_quote(char *s, char c);
+t_token	*split_quote(char **start, char **end, enum e_token *token);
+t_token *split_word(char **start, char **end, enum e_token *token);
+void get_redirect_token(char **start, char **end, enum e_token *token);
+t_token	*split_redirect(char **start, char **end, enum e_token *token);
+t_token	*split_pipe(char **end, enum e_token *token);
+int tokenizing(char *line, t_token *t);
+void	moving_two_pointers(char **start, char **end);
 
 // in parsing
 
 // parsing.c
-int	syntax_pipe(t_ast *node, t_token *t, t_ast *root);
-int	syntax_bundle(t_ast *node, t_token *t);
-int	syntax_redirect(t_ast *node, t_token *t);
-void	syntax_decision_redirect(t_ast *node, t_token *t);
-int	syntax_cmd(t_ast *node, t_token *t);
-void	parsing(t_ast *tree, t_token *token_header);
-void	tree_searching(t_ast *tree);
-void	free_tree(t_ast	*node);
+int syntax_pipe(t_ast *node, t_token *t, t_ast *root);
+int syntax_bundle(t_ast *node, t_token *t, t_ast *root);
+int syntax_redirect(t_ast *node, t_token *t, t_ast *root);
+void syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root);
+int syntax_cmd(t_ast *node, t_token *t, t_ast *root);
+void parsing(t_ast *tree, t_token *token_header);
+void execute_something(t_ast *node);
+void tree_searching(t_ast *node);
+void free_tree(t_ast *node);
 
 // utils.c
 t_token	*ft_token_dup(t_token *src);

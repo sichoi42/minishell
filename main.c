@@ -58,28 +58,26 @@ void	init_term(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
-int	init_token_header(t_token **token_header)
+void	init_token_header(t_token **token_header)
 {
 	*token_header = malloc(sizeof(t_token));
 	if (*token_header == NULL)
-		return (-1);
+		exit(1);
 	(*token_header)->s = NULL;
 	(*token_header)->next = NULL;
-	return (0);
 }
 
-int	init_tree(t_ast **tree)
+void	init_tree(t_ast **tree)
 {
 	*tree = malloc(sizeof(t_ast));
 	if (tree == NULL)
-		return (-1);
+		exit(1);
 	(*tree)->token = NULL;
 	(*tree)->left = NULL;
 	(*tree)->right = NULL;
 	(*tree)->tree_type = TREE_PIPE;
 	(*tree)->pipe_cnt = 0;
 	(*tree)->root = *tree;
-	return (0);
 }
 
 int main(int argc, char **argv)
@@ -99,12 +97,12 @@ int main(int argc, char **argv)
 		line = readline("minishell> ");
 		if (line)
 		{
-			if (init_token_header(&token_header) == -1)
-				return (1);
-			if (ft_tsplit(token_header, line) == -1)
-				return (1);
-			if (init_tree(&tree) == -1)
-				return (1);
+			init_token_header(&token_header);
+			if (tokenizing(line, token_header) == WRONG_ACTION)
+				printf("detected unclosed quote\n");
+			else
+				print_token_list(token_header);
+			init_tree(&tree);
 			parsing(tree, token_header);
 			free_token(token_header);
 			free_tree(tree);

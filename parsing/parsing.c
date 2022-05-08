@@ -9,7 +9,7 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 	i = -1;
 	while (++i < root->pipe_cnt)
 		node = node->right;
-	if (t->type == PIPE)
+	if (t->type & PIPE)
 	{
 		++(node->root->pipe_cnt);
 		node->right = malloc(sizeof(t_ast));
@@ -17,6 +17,7 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 			return (-1);
 		node->right->left = NULL;
 		node->right->right = NULL;
+		node->right->root = root;
 		node->right->tree_type = TREE_PIPE;
 		node->right->token = ft_token_dup(t);
 	}
@@ -29,18 +30,19 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 				return (-1);
 			node->left->left = NULL;
 			node->left->right = NULL;
+			node->left->root = root;
 			node->left->token = NULL;
 			node->left->tree_type = TREE_BUNDLE;
 		}
-		if (syntax_bundle(node->left, t) == -1)
+		if (syntax_bundle(node->left, t, root) == -1)
 			return (-1);
 	}
 	return (0);
 }
 
-int	syntax_bundle(t_ast *node, t_token *t)
+int	syntax_bundle(t_ast *node, t_token *t, t_ast *root)
 {
-	if (t->type == ARGS)
+	if (t->type & ARGS || t->type & STAR)
 	{
 		if (node->right == NULL) // cmd로 최초 방문 시,
 		{
@@ -49,12 +51,13 @@ int	syntax_bundle(t_ast *node, t_token *t)
 				return (-1);
 			node->right->left = NULL;
 			node->right->right = NULL;
+			node->right->root = root;
 			node->right->token = NULL;
 			node->right->tree_type = TREE_CMD;
 		}
-		if (syntax_cmd(node->right, t) == -1);
+		syntax_cmd(node->right, t, root);
 	}
-	else if (t->type == REDIRECT)
+	else if (t->type & REDIRECT)
 	{
 		if (node->left == NULL) // redirect로 최초 방문 시,
 		{
@@ -63,15 +66,16 @@ int	syntax_bundle(t_ast *node, t_token *t)
 				return (-1);
 			node->left->left = NULL;
 			node->left->right = NULL;
+			node->left->root = root;
 			node->left->token = NULL;
 			node->left->tree_type = TREE_RE;
 		}
-		syntax_redirect(node->left, t);
+		syntax_redirect(node->left, t, root);
 	}
 	return (0);
 }
 
-int	syntax_redirect(t_ast *node, t_token *t)
+int	syntax_redirect(t_ast *node, t_token *t, t_ast *root)
 {
 	if (node->left == NULL)
 	{
@@ -80,13 +84,14 @@ int	syntax_redirect(t_ast *node, t_token *t)
 			return (-1);
 		node->left->left = NULL;
 		node->left->right = NULL;
+		node->left->root = root;
 		node->left->token = NULL;
 		node->left->tree_type = TREE_RE;
-		syntax_decision_redirect(node->left, t);
+		syntax_decision_redirect(node->left, t, root);
 	}
 	else
 	{
-		if (t->type == REDIRECT)
+		if (t->type & REDIRECT)
 		{
 			if (node->right == NULL)
 			{
@@ -95,30 +100,31 @@ int	syntax_redirect(t_ast *node, t_token *t)
 					return (-1);
 				node->right->left = NULL;
 				node->right->right = NULL;
+				node->right->root = root;
 				node->right->token = NULL;
 				node->right->tree_type = TREE_RE;
 			}
-			if (syntax_redirect(node->right, t) == -1)
+			if (syntax_redirect(node->right, t, root) == -1)
 				return (-1);
 		}
 	}
 	return (0);
 }
 
-void	syntax_decision_redirect(t_ast *node, t_token *t)
+void	syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root)
 {
 	node->token = ft_token_dup(t);
-	if (t->token == T_RE_OUTPUT)
+	if (t->token & T_RE_OUTPUT)
 		;
-	else if (t->token == T_RE_INPUT)
+	else if (t->token & T_RE_INPUT)
 		;
-	else if (t->token == T_RE_APPEND_OUTPUT)
+	else if (t->token & T_RE_APPEND_OUTPUT)
 		;
-	else if (t->token == T_RE_HEREDOC)
+	else if (t->token & T_RE_HEREDOC)
 		;
 }
 
-int	syntax_cmd(t_ast *node, t_token *t)
+int	syntax_cmd(t_ast *node, t_token *t, t_ast *root)
 {
 	t_token	*p;
 
@@ -166,8 +172,7 @@ void	execute_something(t_ast *node)
 		}
 		else
 			printf("%s\n", t->s);
-		printf("token: %s\n", get_token_str(node->token->token));
-		printf("type: %s\n", get_type_str(node->token->type));
+		print_token_list(t);
 	}
 	printf("------------------\n");
 }
