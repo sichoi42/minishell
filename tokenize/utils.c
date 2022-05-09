@@ -6,14 +6,8 @@ void	print_token_str(enum e_token token)
 {
 	if (token & T_WORD)
 		printf("%s, ", "T_WORD");
-	if (token & T_QUOTE)
-		printf("%s, ", "T_QUOTE");
-	if (token & T_DQUOTE)
-		printf("%s, ", "T_DQUOTE");
 	if (token & T_PIPE)
 		printf("%s, ", "T_PIPE");
-	if (token & T_DOLLAR)
-		printf("%s, ", "T_DOLLAR");
 	if (token & T_STAR)
 		printf("%s, ", "T_STAR");
 	if (token & T_RE_INPUT)
@@ -83,4 +77,45 @@ void	free_token(t_token *t)
 			p = p->next;
 		}
 	}
+}
+
+// s1과 s2의 최대 n개를 연결하여 반환하는 함수.(메모리 복제가 발생하고, s1은 free하지만 s2는 free하지 않음.)
+// s1과 s2는 힙영역에서 할당 받은 문자열로 가정하고 join후 둘을 free시킴.
+char	*ft_strnjoin(char *s1, char *s2, int len)
+{
+	char	*str;
+	int		i;
+	int		j;
+	int		n;
+
+	if (s1 == NULL && s2 != NULL)
+	{
+		return (ft_strndup(s2, len));
+	}
+	if (s1 != NULL && s2 == NULL)
+	{
+		free(s1);
+		return (ft_strdup(s1, len));
+	}
+	str = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (str == NULL)
+		return (NULL);
+	i = -1;
+	while (s1[++i])
+		str[i] = s1[i];
+	n = i;
+	i = 0;
+	j = 0;
+	while (s2[j] && j < len)
+	{
+		if (s2[j] != '\\' || (j > 0 && s2[j - 1] == '\\' && s2[j] == '\\'))
+		{
+			str[n + i] = str[j];
+			++i;
+		}
+		++j;
+	}
+	str[n + i] = 0;
+	free(s1);
+	return (str);
 }

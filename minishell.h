@@ -77,6 +77,7 @@ void	print_token_str(enum e_token token);
 void	print_type_str(enum e_type type);
 void	print_token_list(t_token *t);
 void	free_token(t_token *t);
+char	*ft_strnjoin(char *s1, char *s2, int len);
 
 // tokenize.c
 int is_space(char c);

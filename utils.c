@@ -25,6 +25,30 @@ char	*ft_strchr(char *s, char c)
 	return (NULL);
 }
 
+char	*ft_strdup(char *src)
+{
+	char	*dst;
+	int		i;
+	int		j;
+
+	dst = malloc(ft_strlen(src) + 1);
+	if (dst == NULL)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (src[j])
+	{
+		if (src[j] != '\\' || (j > 0 && src[j - 1] == '\\' && src[j] == '\\'))
+		{
+			dst[i] = src[j];
+			++i;
+		}
+		++j;
+	}
+	dst[i] = 0;
+	return (dst);
+}
+
 char	*ft_strndup(char *src, int len)
 {
 	char	*dst;
@@ -42,7 +66,7 @@ char	*ft_strndup(char *src, int len)
 	j = 0;
 	while (src[j] && j < len)
 	{
-		if (src[j] != '\\')
+		if (src[j] != '\\' || (j > 0 && src[j - 1] == '\\' && src[j] == '\\'))
 		{
 			dst[i] = src[j];
 			++i;
@@ -52,6 +76,7 @@ char	*ft_strndup(char *src, int len)
 	dst[i] = 0;
 	return (dst);
 }
+
 
 // int	is_space(char c)
 // {
