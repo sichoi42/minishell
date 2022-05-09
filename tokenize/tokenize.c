@@ -2,41 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int	is_space(char c)
-{
-	if (c == ' ' || c == '\n' || c == '\t' || c == '\v' || c == '\f' || c == '\r')
-		return (1);
-	return (0);
-}
-
-int	is_redirection(char c)
-{
-	if (c == '>' || c == '<')
-		return (1);
-	return (0);
-}
-
-int is_pipe(char c)
-{
-	if (c == '|')
-		return (1);
-	return (0);
-}
-
-int is_star(char c)
-{
-	if (c == '*')
-		return (1);
-	return (0);
-}
-
-int	is_quote(char c)
-{
-	if (c == '\'' || c == '\"')
-		return (1);
-	return (0);
-}
-
 char	*find_quote(char *s, char c)
 {
 	while (*s)
@@ -82,19 +47,53 @@ t_token	*split_quote(char **start, char **end, enum e_token *token)
 	return (new);
 }
 
+int	get_env_len()
+{
+	return (10);
+}
+
 t_token	*split_word(char **start, char **end, enum e_token *token)
 {
 	t_token	*new;
 	int		offset;
+	char	*q_start;
+	char	*q_end;
+	char	*d_start;
+	char	*d_end;
+	char	*key;
+	char	*value;
 
 	new = malloc(sizeof(t_token));
 	if (new == NULL)
 		exit(1);
 	new->next = NULL;
-	while (**end && !is_space(**end) && !is_pipe(**end) && !is_redirection(**end))
+	while (**end && !ft_strchr(" |><", **end))
 		++(*end);
-	offset = *end - *start;
-	new->s = ft_strndup(*start, offset);
+	q_start = *start;
+	while (q_start && !ft_strchr(" \"\'|><", q_start))
+		++q_start;
+	if (q_start)
+	{
+		q_end = q_start + 1;
+		while (q_end && !ft_strchr(" \"\'|><", q_end))
+			++q_end;
+		if (q_end == NULL)
+			return (NULL);
+		d_start = q_start + 1;
+		while (d_start && !ft_strchr(" $|><", d_start))
+			++d_start;
+		d_end = d_start;
+		while (d_end && !ft_strchr(" |><", d_end))
+			++d_end;
+		key = ft_strndup(d_start, d_end - d_start);
+		value = ft_strndup(value, ft_strlen(value));
+	}
+	else
+		;
+
+
+	// offset = *end - *start;
+	// new->s = ft_strndup(*start, offset);
 	*token |= T_WORD;
 	new->type = ARGS;
 	new->token = *token;
@@ -164,7 +163,7 @@ t_token	*split_star(char **end, enum e_token *token)
 
 void	moving_two_pointers(char **start, char **end)
 {
-	while (**end && is_space(**end))
+	while (**end && ft_strchr(" ", **end))
 		++(*end);
 	*start = *end;
 }
@@ -205,14 +204,12 @@ int	tokenizing(char *line, t_token *t)
 		moving_two_pointers(&start, &end);
 		if (*start)
 		{
-			if (is_redirection(*start))
+			if (ft_strchr(">", *start))
 				new = split_redirect(&start, &end, &token);
-			else if (is_pipe(*start))
+			else if (ft_strchr("|", *start))
 				new = split_pipe(&end, &token);
-			else if (is_star(*start))
+			else if (ft_strchr("*", *start))
 				new = split_star(&end, &token);
-			else if (is_quote(*start))
-				new = split_quote(&start, &end, &token);
 			else
 				new = split_word(&start, &end, &token);
 			if (new == NULL)

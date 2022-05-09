@@ -1,5 +1,4 @@
 #include "minishell.h"
-#include <stddef.h>
 #include <stdlib.h>
 
 int	ft_strlen(char *s)
@@ -12,6 +11,18 @@ int	ft_strlen(char *s)
 	while (s[i])
 		i++;
 	return (i);
+}
+
+char	*ft_strchr(char *s, char c)
+{
+	while (*s)
+	{
+		if (*s == c)
+			if (*(s - 1) != '\\')
+				return ((char *)s);
+		++s;
+	}
+	return (NULL);
 }
 
 char	*ft_strndup(char *src, int len)

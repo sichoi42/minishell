@@ -7,15 +7,13 @@ enum e_token
 {
 	T_INIT = 1,
 	T_WORD = 1 << 1,
-	T_QUOTE = 1 << 2,
-	T_DQUOTE = 1 << 3,
-	T_DOLLAR = 1 << 4,
-	T_RE_INPUT = 1 << 5,
-	T_RE_OUTPUT = 1 << 6,
-	T_RE_HEREDOC = 1 << 7,
-	T_RE_APPEND_OUTPUT = 1 << 8,
-	T_PIPE = 1 << 9,
-	T_STAR = 1 << 10
+	T_EXIT_CODE = 1<< 2,
+	T_RE_INPUT = 1 << 3,
+	T_RE_OUTPUT = 1 << 4,
+	T_RE_HEREDOC = 1 << 5,
+	T_RE_APPEND_OUTPUT = 1 << 6,
+	T_PIPE = 1 << 7,
+	T_STAR = 1 << 8
 };
 
 // 토큰의 type
@@ -70,7 +68,7 @@ typedef struct s_redirect
 int	ft_strlen(char *s);
 char	*ft_strndup(char *src, int len);
 int	is_space(char c);
-char	*ft_strchr(char *s, int c);
+char	*ft_strchr(char *s, char c);
 
 // in tokenize
 

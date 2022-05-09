@@ -80,7 +80,7 @@ void	init_tree(t_ast **tree)
 	(*tree)->root = *tree;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	char			*line;
 	t_token			*token_header; // token 리스트의 헤더.
@@ -88,7 +88,8 @@ int main(int argc, char **argv)
 
 	if (argc > 1)
 		return (1);
-	argv = argv;
+	(void)argv;
+	(void)envp;
 	init_term();
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);

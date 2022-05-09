@@ -113,6 +113,7 @@ int	syntax_redirect(t_ast *node, t_token *t, t_ast *root)
 
 void	syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root)
 {
+	(void)root;
 	node->token = ft_token_dup(t);
 	if (t->token & T_RE_OUTPUT)
 		;
@@ -128,6 +129,7 @@ int	syntax_cmd(t_ast *node, t_token *t, t_ast *root)
 {
 	t_token	*p;
 
+	(void)root;
 	if (node->token == NULL)
 		node->token = ft_token_dup(t); // 메모리를 복사.
 	else
