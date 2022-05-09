@@ -71,6 +71,8 @@ typedef struct s_envs {
 	t_env	*last;
 	int		capa;
 	int		size;
+	char	*pwd;
+	char	*old_pwd;
 }	t_envs;
 
 typedef struct s_paths {
@@ -108,6 +110,7 @@ int		ft_strlen(char *str);
 int		ft_strlen_c(char *str, char c);
 int		ft_strlcpy(char *str, char *target, int len);
 int		ft_strcpy(char *str, char *target);
+int		ft_strlcmp(char *l, char *r, int len);
 int		ft_strcmp(char *l, char *r);
 int		ft_max(int l, int r);
 

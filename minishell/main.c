@@ -181,27 +181,18 @@ void	free_envs(t_envs *e, t_flevel level)
 int	envs_element_alloc(t_envs *e, int i, int max)
 {
 	if (i == max)
-		return (0);
+		return (OK);
 	e->envs[i]->k_len = ft_strlen_c(e->env[i], '=');
 	e->envs[i]->v_len = ft_strlen(e->env[i] + e->envs[i]->k_len + 1);
-	e->envs[i]->key = malloc(sizeof(char) * (e->envs[i]->k_len + 1));
-	if (e->envs[i]->key == NULL)
-		return (1);
-	e->envs[i]->value = malloc(sizeof(char) * (e->envs[i]->v_len + 1));
-	if (e->envs[i]->value == NULL)
+	e->envs[i]->key = malloc_array(sizeof(char), e->envs[i]->k_len + 1);
+	e->envs[i]->value = malloc_array(sizeof(char), e->envs[i]->v_len + 1);
+	if (ft_strcmp(e->envs[i]->key, "OLDPWD") == 0)
 	{
-		free(e->envs[i]->key);
-		return (1);
-	}
-	if (envs_element_alloc(e, i + 1, max) == 1)
-	{
-		free(e->envs[i]->key);
 		free(e->envs[i]->value);
-		if (i == 0)
-			free_envs(e, BEF_KEY_SET);
-		return (1);
+		e->envs[i]->v_len = -1;
 	}
-	return (0);
+	envs_element_alloc(e, i + 1, max);
+	return (OK);
 }
 
 int	ft_strlcpy(char *src, char *target, int len)
@@ -250,6 +241,23 @@ int	ft_strcmp(char *l, char *r)
 	return (*l - *r);
 }
 
+int	ft_strlcmp(char *l, char *r, int len)
+{
+	int	i;
+
+	i = -1;
+	while (*l != '\0' && ++i < len)
+	{
+		if (*l != *r)
+			break ;
+		++l;
+		++r;
+	}
+	if (i == len)
+		return (OK);
+	return (*l - *r);
+}
+
 void	print_export(t_envs *e)
 {
 	t_env	*env;
@@ -274,7 +282,8 @@ void	print_env(t_envs *e)
 
 	i = -1;
 	while (++i < e->size)
-		printf("%s\n", e->env[i]);
+		if (e->envs[i]->v_len != -1)
+			printf("%s\n", e->env[i]);
 }
 
 void	find_env_r(t_envs *e, char *key, int last)
@@ -359,12 +368,13 @@ void	init_envs(t_envs *e)
 	{
 		ft_strlcpy(e->env[i], e->envs[i]->key, e->envs[i]->k_len);
 		set_env_lr(e, e->envs[i]->key, i);
-		ft_strlcpy(e->env[i] + e->envs[i]->k_len + 1,
-			e->envs[i]->value, e->envs[i]->v_len);
+		if (e->envs[i]->v_len != -1)
+			ft_strlcpy(e->env[i] + e->envs[i]->k_len + 1,
+				e->envs[i]->value, e->envs[i]->v_len);
 	}
 }
 
-void	ft_envcpy(t_envs *e, char *env[])
+static void	ft_envcpy(t_envs *e, char *env[])
 {
 	int	i;
 	int	len;
@@ -397,6 +407,13 @@ int	input_env(t_envs *e, char *env[])
 	if (envs_element_alloc(e, 0, e->size) == 1)
 		return (1);
 	init_envs(e);
+	e->old_pwd = NULL;
+	e->pwd = getcwd(NULL, 0);
+	if (e->pwd == NULL)
+	{
+		print_error("bash", strerror(errno), NULL, NULL);
+		return (1);
+	}
 	return (0);
 }
 
@@ -428,9 +445,7 @@ static void	insert_new_env(t_envs *e, char *key, char *value)
 	int	k_len;
 	int	v_len;
 
-	e->envs[e->size] = malloc(sizeof(t_env));
-	if (e->envs[e->size] == NULL)
-		exit(1);
+	e->envs[e->size] = malloc_array(sizeof(t_env), 1);
 	e->envs[e->size]->k_len = ft_strlen(key);
 	if (value == NULL)
 		e->envs[e->size]->v_len = -1;
@@ -441,8 +456,13 @@ static void	insert_new_env(t_envs *e, char *key, char *value)
 	e->envs[e->size]->key = malloc_array(sizeof(char), k_len + 1);
 	ft_strcpy(key, e->envs[e->size]->key);
 	set_env_lr(e, key, e->size);
-	e->envs[e->size]->value = malloc_array(sizeof(char), v_len + 1);
-	ft_strcpy(value, e->envs[e->size]->value);
+	if (v_len != -1)
+	{
+		e->envs[e->size]->value = malloc_array(sizeof(char), v_len + 1);
+		ft_strcpy(value, e->envs[e->size]->value);
+	}
+	else
+		e->envs[e->size]->value = NULL;
 	e->size += 1;
 	e->envs[e->size] = NULL;
 }
@@ -789,12 +809,14 @@ int	ft_exit(t_oper *o)
 		printf("%lld\n", num % 256);
 		exit(num % 256);
 	}
+	// single command면.
 	printf("exit\n");
 	exit(OK);
 }
 
 int	ft_env(t_envs *e)
 {
+	// 이 부분도 결정해야함. bash랑 똑같이 할지, 아니면..?
 	insert_env(e, "_", "/usr/bin/env");
 	print_env(e);
 	return (OK);
@@ -829,7 +851,11 @@ int	ft_unset(t_oper *o, t_envs *e)
 		if (check_key(o->opers[i]) == ERROR)
 			rtn = check_key_error("unset", o->opers[i]);
 		else
+		{
 			delete_env(e, o->opers[i]);
+			if (ft_strcmp(o->opers[i], "PWD") == 0)
+				e->pwd[0] = '\0';
+		}
 	}
 	return (rtn);
 }
@@ -884,13 +910,107 @@ int	ft_export(t_oper *o, t_envs *e)
 	}
 	if (i == 1)
 		print_export(e);
+	free(key);
+	free(value);
 	return (rtn);
+}
+
+char	*ft_strcat(char *org, char *target)
+{
+	int	i;
+
+	i = -1;
+	while (target[++i] != '\0')
+		;
+	while (*org != '\0')
+		target[i++] = *org++;
+	target[i] = '\0';
+	return (target);
+}
+
+static int	check_echo_option(char *arg)
+{
+	int	i;
+
+	i = 0;
+	if (arg[i] == '-')
+	{
+		while (arg[++i] == 'n')
+			;
+		if (arg[i] == '\0')
+			return (OK);
+	}
+	return (1);
 }
 
 int	ft_echo(t_oper *o)
 {
+	int	i;
+	int	first;
+	int	option;
+
+	option = 0;
+	i = 0;
+	while (o->opers[++i] != NULL)
+		if (check_echo_option(o->opers[i]) != OK)
+			break ;
+		else if (option == 0)
+			option = 1;
+	first = 1;
+	while (o->opers[i] != NULL)
+	{
+		if (first++ != 1)
+			printf(" ");
+		printf("%s", o->opers[i++]);
+	}
+	if (option == 0)
+		printf("\n");
 	return (OK);
 }
+
+static int	set_pwd(t_envs *e, char *pwd)
+{
+	free(e->old_pwd);
+	e->old_pwd = e->pwd;
+	e->pwd = malloc_array(sizeof(char), ft_strlen(pwd) + 1);
+	ft_strcpy(pwd, e->pwd);
+	if (search_env(e, "PWD") != -1)
+		insert_env(e, "PWD", pwd);
+	if (search_env(e, "OLDPWD") != -1)
+		insert_env(e, "OLDPWD", e->old_pwd);
+	return (OK);
+}
+
+int	ft_cd(t_oper *o, t_envs *e)
+{
+	char	*temp;
+
+	if (o->opers[1] != NULL)
+	{
+		if (chdir(o->opers[1]) != OK)
+		{
+			print_error("bash", "cd", o->opers[1], strerror(errno));
+			return (ERROR);
+		}
+		return (set_pwd(e, o->opers[1]));
+	}
+	temp = get_env_value(e, "HOME");
+	if (temp == NULL)
+	{
+		print_error("bash", "cd", "HOME not set", NULL);
+		return (ERROR);
+	}
+	if (chdir(temp) != OK)
+	{
+		print_error("bash", "cd", o->opers[1], strerror(errno));
+		return (ERROR);
+	}
+	return (set_pwd(e, temp));
+}
+
+/* 리턴값을 exit_code로 넣을 것인지,
+ * g_exit_code에 값은 넣고, return은 check의 용도로만 쓸것인지 정해야함.
+ */
 
 int	built_in_check(t_oper *o, t_envs *e)
 {
@@ -909,7 +1029,7 @@ int	built_in_check(t_oper *o, t_envs *e)
 		if (len == 4 && ft_strcmp("echo", o->opers[0]) == 0)
 			return (ft_echo(o));
 		else if (len == 2 && ft_strcmp("cd", o->opers[0]) == 0)
-			printf("cd\n");
+			return (ft_cd(o, e));
 		else if (len == 3 && ft_strcmp("pwd", o->opers[0]) == 0)
 			return (ft_pwd());
 		else if (len == 3 && ft_strcmp("env", o->opers[0]) == 0)
