@@ -1,5 +1,77 @@
 #include "minishell.h"
 
+void	print_error(char *a, char *b, char *c, char *d)
+{
+	write(2, a, ft_strlen(a));
+	if (b != NULL)
+	{
+		write(2, ": ", 2);
+		write(2, b, ft_strlen(b));
+		if (c != NULL)
+		{
+			write(2, ": ", 2);
+			write(2, c, ft_strlen(c));
+			if (d != NULL)
+			{
+				write(2, ": ", 2);
+				write(2, d, ft_strlen(d));
+			}
+		}
+	}
+	write(2, "\n", 1);
+}
+
+int	ft_isspace(int c)
+{
+	if ((c >= 0x09 && c <= 0x0d) || c == ' ')
+		return (1);
+	else
+		return (0);
+}
+
+void	check_minus(const char *str, size_t *index, int *is_minus)
+{
+	if (str[*index] == '-')
+	{
+		++(*index);
+		*is_minus = 1;
+	}
+	else
+	{
+		if (str[*index] == '+')
+			++(*index);
+		*is_minus = 0;
+	}
+}
+
+unsigned long long ft_atoi(const char *str)
+{
+	size_t				i;
+	int					is_minus;
+	unsigned long long	num;
+
+	i = 0;
+	while (ft_isspace(str[i]) != 0)
+		++i;
+	check_minus(str, &i, &is_minus);
+	num = 0;
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		num = (num * 10) + str[i++] - '0';
+		if (num >= OVER_LONG_NUM)
+			return (OVER_LONG_NUM);
+	}
+	if (is_minus == 1 && num > OVER_LONG_NUM)
+		return (OVER_LONG_NUM);
+	else if (is_minus == 1)
+		num *= -1;
+	while (ft_isspace(str[i]) != 0)
+		++i;
+	if (str[i] != '\0')
+		return (OVER_LONG_NUM);
+	return (num);
+}
+
 void	*ft_realloc(void *ptr, int ptr_size, int new_size)
 {
 	char	*temp;
@@ -56,7 +128,7 @@ int	envs_alloc(void **ptr, int size, int i, int max)
 	}
 	return (0);
 }
-
+/*
 void	free_envs(t_envs *e, t_flevel level)
 {
 	int	i;
@@ -77,6 +149,32 @@ void	free_envs(t_envs *e, t_flevel level)
 			free(e->envs[i]);
 		}
 		free(e->envs);
+	}
+}
+*/
+
+void	free_envs(t_envs *e, t_flevel level)
+{
+	int	i;
+
+	i = -1;
+	if (level == BEF_KEY_SET)
+	{
+		while (++i < e->size)
+			free(e->envs[i]);
+		free(e->envs);
+	}
+	else if (level == AFT_KEY_SET)
+	{
+		while (++i < e->size)
+		{
+			free(e->envs[i]->key);
+			free(e->envs[i]->value);
+			free(e->envs[i]);
+			free(e->env[i]);
+		}
+		free(e->envs);
+		free(e->env);
 	}
 }
 
@@ -112,6 +210,20 @@ int	ft_strlcpy(char *src, char *target, int len)
 
 	i = 0;
 	while (src[i] != '\0' && i < len)
+	{
+		target[i] = src[i];
+		++i;
+	}
+	target[i] = '\0';
+	return (i);
+}
+
+int	ft_strcpy(char *src, char *target)
+{
+	int i;
+
+	i = 0;
+	while (src[i] != '\0')
 	{
 		target[i] = src[i];
 		++i;
@@ -162,10 +274,7 @@ void	print_env(t_envs *e)
 
 	i = -1;
 	while (++i < e->size)
-	{
-		if (e->envs[i]->v_len != -1)
-			printf("%s=%s\n", e->envs[i]->key, e->envs[i]->value);
-	}
+		printf("%s\n", e->env[i]);
 }
 
 void	find_env_r(t_envs *e, char *key, int last)
@@ -255,12 +364,28 @@ void	init_envs(t_envs *e)
 	}
 }
 
+void	ft_envcpy(t_envs *e, char *env[])
+{
+	int	i;
+	int	len;
+
+	e->env = malloc_array(sizeof(char *), (e->size + 1));
+	e->env[e->size] = NULL;
+	i = -1;
+	while (env[++i] != NULL)
+	{
+		len = ft_strlen(env[i]);
+		e->env[i] = malloc_array(sizeof(char), len + 1);
+		ft_strcpy(env[i], e->env[i]);
+	}
+}
+
 int	input_env(t_envs *e, char *env[])
 {
-	e->env = env;
 	e->size = -1;
 	while (env[++(e->size)] != NULL)
 		;
+	ft_envcpy(e, env);
 	e->capa = SIZE;
 	while (e->capa <= e->size)
 		e->capa *= 2;
@@ -300,24 +425,58 @@ char	*get_env_value(t_envs *e, char *key)
 
 static void	insert_new_env(t_envs *e, char *key, char *value)
 {
+	int	k_len;
+	int	v_len;
+
 	e->envs[e->size] = malloc(sizeof(t_env));
 	if (e->envs[e->size] == NULL)
 		exit(1);
-	e->envs[e->size]->key = key;
 	e->envs[e->size]->k_len = ft_strlen(key);
-	set_env_lr(e, key, e->size);
-	e->envs[e->size]->value = value;
 	if (value == NULL)
 		e->envs[e->size]->v_len = -1;
 	else
 		e->envs[e->size]->v_len = ft_strlen(value);
+	k_len = e->envs[e->size]->k_len;
+	v_len = e->envs[e->size]->v_len;
+	e->envs[e->size]->key = malloc_array(sizeof(char), k_len + 1);
+	ft_strcpy(key, e->envs[e->size]->key);
+	set_env_lr(e, key, e->size);
+	e->envs[e->size]->value = malloc_array(sizeof(char), v_len + 1);
+	ft_strcpy(value, e->envs[e->size]->value);
 	e->size += 1;
+	e->envs[e->size] = NULL;
+}
+
+void	insert_main_env(t_envs *e, int i, char *key, char *value)
+{
+	int	k_len;
+	int	v_len;
+
+	if (i == -1)
+		i = e->size - 1;
+	else
+		free(e->env[i]);
+	k_len = e->envs[i]->k_len;
+	v_len = e->envs[i]->v_len;
+	if (v_len != -1)
+		e->env[i] = malloc_array(sizeof(char), k_len + v_len + 2);
+	else
+		e->env[i] = malloc_array(sizeof(char), k_len + 1);
+	ft_strcpy(e->envs[i]->key, e->env[i]);
+	if (v_len != -1)
+	{
+		e->env[i][k_len] = '=';
+		ft_strcpy(e->envs[i]->value, e->env[i] + k_len + 1);
+	}
+	else
+		e->env[i][k_len] = '\0';
+	e->env[e->size] = NULL;
 }
 
 int	check_key(char *key)
 {
 	if (*key >= '0' && *key <= '9')
-		return (1);
+		return (ERROR);
 	while (*key != '\0')
 	{
 		if (*key == '_')
@@ -329,10 +488,18 @@ int	check_key(char *key)
 		else if (*key >= '0' && *key <= '9')
 			;
 		else
-			return (1);
+			return (ERROR);
 		++key;
 	}
-	return (0);
+	return (OK);
+}
+
+void	change_exist_env(t_envs *e, int i, char *value)
+{
+	free(e->envs[i]->value);
+	e->envs[i]->v_len = ft_strlen(value);
+	e->envs[i]->value = malloc_array(sizeof(char), e->envs[i]->v_len + 1);
+	ft_strcpy(value, e->envs[i]->value);
 }
 
 /*
@@ -340,6 +507,34 @@ int	check_key(char *key)
  * key, value는 malloc된 값이 들어온다고 가정
  */
 
+int	insert_env(t_envs *e, char *key, char *value)
+{
+	int	index;
+
+	index = search_env(e, key);
+	if (index == -1)
+	{
+		if (e->capa == e->size + 2)
+		{
+			e->capa *= 2;
+			e->envs = (t_env **)ft_realloc(e->envs, sizeof(t_env *) * e->size,
+					sizeof(t_env *) * e->capa);
+			e->env = (char **)ft_realloc(e->env, sizeof(char *) * e->size,
+					sizeof(char *) * e->capa);
+		}
+		insert_new_env(e, key, value);
+	}
+	else
+	{
+		if (value == NULL)
+			return (0);
+		change_exist_env(e, index, value);
+	}
+	insert_main_env(e, index, key, value);
+	return (0);
+}
+
+/*
 int	insert_env(t_envs *e, char *key, char *value)
 {
 	int	index;
@@ -365,11 +560,22 @@ int	insert_env(t_envs *e, char *key, char *value)
 	}
 	return (0);
 }
+*/
+
+void	delete_main_env(t_envs *e, int i, char *key)
+{
+	free(e->env[i]);
+	if (i != e->size)
+		e->env[i] = e->env[e->size];
+	e->env[e->size] = NULL;
+}
 
 int	delete_env(t_envs *e, char *key)
 {
 	int	index;
 
+	if (ft_strcmp(key, "_") == 0)
+		return (0);
 	index = search_env(e, key);
 	if (index == -1)
 		return (1);
@@ -387,6 +593,8 @@ int	delete_env(t_envs *e, char *key)
 	if (index != e->size - 1)
 		e->envs[index] = e->envs[e->size - 1];
 	e->size -= 1;
+	e->envs[e->size] = NULL;
+	delete_main_env(e, index, key);
 	return (0);
 }
 
@@ -399,13 +607,13 @@ int	dup_check(int fd_l, int fd_r)
 	if (rtn == -1)
 	{
 		// 추후 struct 정해지면 파일이름 추가해서 에러 출력
-		printf("bash: %s\n", strerror(errno));
+		print_error("bash", strerror(errno), NULL, NULL);
+		//printf("bash: %s\n", strerror(errno));
 		exit(1);
 	}
 	return (OK);
 }
 
-// heredoc 실행
 int	red_here_doc(int *fd, char *limit)
 {
 	char	*str;
@@ -422,11 +630,63 @@ int	red_here_doc(int *fd, char *limit)
 	*fd = open(TEMP_FILE, O_RDWR);
 	if (*fd == -1)
 	{
-		printf("bash: %s: %s\n", TEMP_FILE, strerror(errno));
+		print_error("bash", TEMP_FILE, strerror(errno), NULL);
+		//printf("bash: %s: %s\n", TEMP_FILE, strerror(errno));
 		return (WRONG_ACTION);
 	}
 	unlink(TEMP_FILE);
 	return (dup_check(*fd, STDIN_FILENO));
+}
+
+int	red_in(char *f_name)
+{
+	int fd;
+
+	fd = open(f_name, O_RDWR);
+	if (fd == -1)
+		print_error("bash", f_name, strerror(errno), NULL);
+		//printf("bash: %s: %s\n", f_name, strerror(errno));
+	else
+	{
+		dup_check(fd, STDIN_FILENO);
+		close(fd);
+		return (OK);
+	}
+	return (WRONG_ACTION);
+}
+
+int	red_out(char *f_name)
+{
+	int fd;
+
+	fd = open(f_name, O_RDWR | O_CREAT | O_TRUNC, 0664);
+	if (fd == -1)
+		print_error("bash", f_name, strerror(errno), NULL);
+		//printf("bash: %s: %s\n", f_name, strerror(errno));
+	else
+	{
+		dup_check(fd, STDOUT_FILENO);
+		close(fd);
+		return (OK);
+	}
+	return (WRONG_ACTION);
+}
+
+int	red_append(char *f_name)
+{
+	int fd;
+
+	fd = open(f_name, O_WRONLY | O_CREAT | O_APPEND, 0664);
+	if (fd == -1)
+		print_error("bash", f_name, strerror(errno), NULL);
+		//printf("bash: %s: %s\n", f_name, strerror(errno));
+	else
+	{
+		dup_check(fd, STDOUT_FILENO);
+		close(fd);
+		return (OK);
+	}
+	return (WRONG_ACTION);
 }
 
 /*
@@ -437,27 +697,28 @@ int	red_here_doc(int *fd, char *limit)
  * here_doc의 경우 f_name에 ".이름" 방식으로 이름 넣기.
  */
 // 리다이렉션 오픈하는 함수 + heredoc 실행까지
-int	red_open_file(int *fd, enum e_token t, char *f_name)
+int	red_open_file(enum e_token t, char *f_name)
 {
+	int	fd;
+
 	if (t == T_RE_INPUT)
-		*fd = open(f_name, O_RDWR);
+		return (red_in(f_name));
 	else if (t == T_RE_APPEND_OUTPUT)
-		*fd = open(f_name, O_WRONLY | O_CREAT | O_APPEND, 0777);
+		return (red_append(f_name));
 	else if (t == T_RE_OUTPUT)
-		*fd = open(f_name, O_RDWR | O_CREAT | O_TRUNC, 0664);
+		return (red_out(f_name));
 	else if (t == T_RE_HEREDOC)
 	{
-		*fd = open(TEMP_FILE, O_RDWR | O_CREAT | O_TRUNC, 0664);
-		if (*fd == -1)
+		fd = open(TEMP_FILE, O_RDWR | O_CREAT | O_TRUNC, 0664);
+		if (fd == -1)
 		{
-			printf("bash: %s: %s\n", TEMP_FILE, strerror(errno));
+			print_error("bash", TEMP_FILE, strerror(errno), NULL);
+			//printf("bash: %s: %s\n", TEMP_FILE, strerror(errno));
 			return (WRONG_ACTION);
 		}
-		return (red_here_doc(fd, f_name));
+		return (red_here_doc(&fd, f_name));
 	}
-	if (*fd == -1)
-		printf("bash: %s: %s\n", f_name, strerror(errno));
-	return (OK);
+	return (WRONG_ACTION);
 }
 
 void	free_double_char(char **dptr)
@@ -487,18 +748,195 @@ void	ft_tolower(char **str)
 	}
 }
 
-int	built_in_check(char *oper)
+int	ft_pwd(void)
 {
-	if (ft_strcmp("export", oper) == 0)
-		;
-	else if (ft_strcmp("unset", oper) == 0)
-		;
-	else if (ft_strcmp("exit", oper) == 0)
-		;
+	char	*path;
+
+	path = getcwd(NULL, 0);
+	if (path ==  NULL)
+	{
+		print_error("bash", "pwd", strerror(errno), NULL);
+		//printf("bash: %s: %s\n", "pwd", strerror(errno));
+		return (ERROR);
+	}
+	else
+		printf("%s\n", path);
+	free(path);
+	return (OK);
+}
+
+int	ft_exit(t_oper *o)
+{
+	unsigned long long	num;
+
+	if (o->opers[1] != NULL)
+	{
+		num = ft_atoi(o->opers[1]);
+		if (num == OVER_LONG_NUM)
+		{
+			print_error("bash", "exit", o->opers[1], NUMERIC_ERROR);
+			//printf("bash: exit: %s: %s\n", o->opers[i], NUMERIC_ERROR);
+			exit(255);
+		}
+		if (o->opers[2] != NULL)
+		{
+			print_error("bash", "exit", ARG_NUM_ERROR, NULL);
+			//printf("bash: exit: %s\n", ARG_NUM_ERROR);
+			return (1);
+		}
+		// single command면.
+		printf("exit\n");
+		printf("%lld\n", num % 256);
+		exit(num % 256);
+	}
+	printf("exit\n");
+	exit(OK);
+}
+
+int	ft_env(t_envs *e)
+{
+	insert_env(e, "_", "/usr/bin/env");
+	print_env(e);
+	return (OK);
+}
+
+int	check_key_error(char *oper, char *arg)
+{
+	int		len;
+	char	*err_arg;
+
+	len = ft_strlen(arg);
+	err_arg = malloc_array(sizeof(char), len + 3);
+	err_arg[0] = '`';
+	ft_strcpy(arg, err_arg + 1);
+	err_arg[len + 1] = '\'';
+	err_arg[len + 2] = '\0';
+	print_error("bash", oper, err_arg, NOT_VALID_ERROR);
+	return (ERROR);
+}
+
+int	ft_unset(t_oper *o, t_envs *e)
+{
+	int		i;
+	int		len;
+	int		rtn;
+	char	*e_oper;
+
+	i = 0;
+	rtn = OK;
+	while (o->opers[++i] != NULL)
+	{
+		if (check_key(o->opers[i]) == ERROR)
+			rtn = check_key_error("unset", o->opers[i]);
+		else
+			delete_env(e, o->opers[i]);
+	}
+	return (rtn);
+}
+
+/*
+ * 따옴표 처리하는 부분을 추가해줘야 한다.
+ */
+
+static void	make_key_value(char *arg, char **key, char **value)
+{
+	int	i;
+	int	k_len;
+	int	v_len;
+
+	k_len = ft_strlen_c(arg, '=');
+	*key = malloc_array(sizeof(char), k_len + 1);
+	ft_strlcpy(arg, *key, k_len);
+	i = -1;
+	while (arg[++i] != '\0')
+		if (arg[i] == '=')
+			break ;
+	if (arg[i] != '\0')
+	{
+		v_len = ft_strlen(arg + k_len + 1);
+		*value = malloc_array(sizeof(char), v_len + 1);
+		ft_strcpy(arg + k_len + 1, *value);
+		return ;
+	}
+	v_len = -1;
+	*value = NULL;
+}
+
+// 따옴표 들어왔을 때 처리는 따로 해줘야함.
+// 이건 입력이 실제로 어떻게 들어오는지 확인하면서 수정하자.
+int	ft_export(t_oper *o, t_envs *e)
+{
+	int		i;
+	int		rtn;
+	char	*e_oper;
+	char	*key;
+	char	*value;
+
+	rtn = OK;
+	i = 0;
+	while (o->opers[++i] != NULL)
+	{
+		make_key_value(o->opers[i], &key, &value);
+		if (check_key(key) == ERROR)
+			rtn = check_key_error("export", o->opers[i]);
+		else
+			insert_env(e, key, value);
+	}
+	if (i == 1)
+		print_export(e);
+	return (rtn);
+}
+
+int	ft_echo(t_oper *o)
+{
+	return (OK);
+}
+
+int	built_in_check(t_oper *o, t_envs *e)
+{
+	int	len;
+
+	len = ft_strlen(o->opers[0]);
+	if (len == 6 && ft_strcmp("export", o->opers[0]) == 0)
+		return (ft_export(o, e));
+	else if (len == 5 && ft_strcmp("unset", o->opers[0]) == 0)
+		return (ft_unset(o, e));
+	else if (len == 4 && ft_strcmp("exit", o->opers[0]) == 0)
+		return (ft_exit(o));
 	else
 	{
-		ft_tolower(&oper);
+		ft_tolower(&(o->opers[0]));
+		if (len == 4 && ft_strcmp("echo", o->opers[0]) == 0)
+			return (ft_echo(o));
+		else if (len == 2 && ft_strcmp("cd", o->opers[0]) == 0)
+			printf("cd\n");
+		else if (len == 3 && ft_strcmp("pwd", o->opers[0]) == 0)
+			return (ft_pwd());
+		else if (len == 3 && ft_strcmp("env", o->opers[0]) == 0)
+			return (ft_env(e));
+		else
+			return (-1);
 	}
+	return (OK);
+}
+
+void	init_pipe(int *pipe_fd)
+{
+	pipe_fd[0] = -1;
+	pipe_fd[1] = -1;
+}
+
+int	make_pipe(int *p_fd)
+{
+	int	rtn;
+
+	rtn = pipe(p_fd);
+	if (rtn == -1)
+	{
+		printf("bash: %s\n", strerror(errno));
+		exit(1);
+	}
+	dup_check(p_fd[1], STDOUT_FILENO);
 	return (0);
 }
 
@@ -526,28 +964,57 @@ int main(int argc, char *argv[], char *env[])
 	t_paths	p;
 	t_oper	o;
 	char	*input_oper;
+	int		pipe_fd[2];
+	int		status;
 
 	if (input_env(&e, env) == 1)
 		return (1);
 	// 여기서부터 redirection 부분.
-	//if (red_open_file(&fd, T_RE_HEREDOC, "a") == -1)
-		/*error check*/
-	// 마지막 (in or heredoc 와 out or append) 를 dup2 해줘야함.
-	// 재귀함수를 이용해서 마지막 경우에만 dup2를 하고, 나머지는 걍 close();
-	// dup2 이후에 모든 fd close 해주는 함수 필요.
-	// 파이프 처리시에 out쪽 red~ 있으면 파이프로 넘겨줄 값 없음.
-	// out 없으면 여기서 나온 값을 넘겨줌.
-	// 새로 pipe시작하면 stdin 값을 원상복귀 시켜줘야할 듯?(stdin 버퍼 지우기)
+
+	/* >> 시스템 함수 실행시 pipe close()할 때를 위해 init() */
+	//init_pipe(pipe_fd);
+	/* >> 만약 pipe가 있으면 미리 여기서 pipe 생성 후 out redirection 연결*/
+	//make_pipe(pipe_fd);
+	/* >> pipe가 없으면 stdout 다시 제대로 연결 */
+	//dup_check(STDOUT_FILENO, STDOUT_FILENO);
+
+	/* >> redirection open && dup2 && close(fd) */
+	//if (red_open_file(T_RE_HEREDOC, "a") == WRONG_ACTION)
+		/*error check 후에 종료 또는 다음 pipe 실행*/
 
 	find_path(&(p.paths), &(p.max_len));
 	input_oper = argv[1];
 	o.oper_path = make_oper(&o.opers, p.max_len, p.paths, input_oper);
-	printf("%s\n", o.oper_path);
-	built_in_check(o.opers[0]);
-	// built-in 함수 체크
-	// built-in 실행
-	// 시스템 함수 실행
+	
 	// 파이프 유무 체크 후 확인.
+	// 파이프가 있으면 cd 도 동작 안함.(이동하지 않음)
+	// 즉 파이프가 있으면 무조건 fork해서 실행된다.
+	
+	// 아래 함수 부터 수정하면 됨.
+	/*===========================================================*/
+	/*
+	 * if (파이프 있으면)
+	 * 		자식 생성 함수
+	 * else
+	 * 		if 빌트인 함수면
+	 * 			빌트인 함수 실행
+	 * 		else
+	 * 			시스템 함수 실행
+	 */
+	/*===========================================================*/
+	if (built_in_check(&o, &e) == -1)
+	{
+		if (o.oper_path == NULL)
+			printf("bash: %s: %s\n", o.opers[0], COMMAND_ERROR); // exit:127
+		else
+			exe_oper(&o, pipe_fd, e.env);
+	}
+	/*===========================================================*/
+	while (waitpid(-1, &status, 0) >= 0)
+		;
+	// 만약 다음 파이프가 없고 status == 11 이라면 아래의 값 출력
+		//printf("Segmentation fault: %d\n", status);
+		//exit code: 128+11=139
 	free_double_char(o.opers);// 매 번들마다.
 	free(o.oper_path);//매 번들마다.
 

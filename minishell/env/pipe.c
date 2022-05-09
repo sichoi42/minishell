@@ -7,7 +7,7 @@ void	*malloc_array(int size, int len)
 	temp = malloc(size * len);
 	if (temp == NULL)
 	{
-		print_error("bash", strerror(errno), NULL, NULL);
+		printf("bash: %s\n", strerror(errno));
 		exit(1);
 	}
 	return (temp);
@@ -208,7 +208,7 @@ void	exe_oper(t_oper *o, int *pipe_fd, char *envp[])
 		// 빌트인이면 빌트인 실행
 		// 아니면
 		execve(o->oper_path, o->opers, envp);
-		print_error("bash", o->opers[0], strerror(errno), NULL);
+		printf("bash: %s: %s\n", o->opers[0], strerror(errno));
 		exit(1);
 	}
 	else if (pid == -1)

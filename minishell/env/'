@@ -75,10 +75,8 @@ void	free_envs(t_envs *e, t_flevel level)
 			free(e->envs[i]->key);
 			free(e->envs[i]->value);
 			free(e->envs[i]);
-			free(e->env[i]);
 		}
 		free(e->envs);
-		free(e->env);
 	}
 }
 
@@ -178,7 +176,10 @@ void	print_env(t_envs *e)
 
 	i = -1;
 	while (++i < e->size)
-		printf("%s\n", e->env[i]);
+	{
+		if (e->envs[i]->v_len != -1)
+			printf("%s=%s\n", e->envs[i]->key, e->envs[i]->value);
+	}
 }
 
 void	find_env_r(t_envs *e, char *key, int last)
@@ -273,7 +274,7 @@ void	ft_envcpy(t_envs *e, char *env[])
 	int	i;
 	int	len;
 
-	e->env = malloc_array(sizeof(char *), (e->capa));
+	e->env = malloc_array(sizeof(char *), (e->size + 1));
 	e->env[e->size] = NULL;
 	i = -1;
 	while (env[++i] != NULL)
@@ -289,10 +290,10 @@ int	input_env(t_envs *e, char *env[])
 	e->size = -1;
 	while (env[++(e->size)] != NULL)
 		;
+	ft_envcpy(e, env);
 	e->capa = SIZE;
 	while (e->capa <= e->size)
 		e->capa *= 2;
-	ft_envcpy(e, env);
 	e->envs = malloc(sizeof(t_env *) * e->capa);
 	if (e->envs == NULL)
 		return (1);
@@ -341,33 +342,27 @@ static void	insert_new_env(t_envs *e, char *key, char *value)
 	else
 		e->envs[e->size]->v_len = ft_strlen(value);
 	e->size += 1;
-	e->envs[e->size] = NULL;
 }
 
-void	insert_main_env(t_envs *e, int i, char *key, char *value)
+void	insert_char_env(t_envs *e, int i, char *key, char *value)
 {
 	int	k_len;
 	int	v_len;
 
+	k_len = e->envs[i]->k_len;
+	v_len = e->envs[i]->v_len;
 	if (i == -1)
 		i = e->size - 1;
 	else
 		free(e->env[i]);
-	k_len = e->envs[i]->k_len;
-	v_len = e->envs[i]->v_len;
-	if (v_len != -1)
-		e->env[i] = malloc(sizeof(char) * (k_len + v_len + 2));
-	else
-		e->env[i] = malloc(sizeof(char) * (k_len + 1));
+	printf("asdf\n");
+	fflush(0);
+	e->env[i] = malloc_array(sizeof(char), k_len + v_len + 2);
+	printf("asdf\n");
+	fflush(0);
 	ft_strcpy(e->envs[i]->key, e->env[i]);
-	if (v_len != -1)
-	{
-		e->env[i][k_len] = '=';
-		ft_strcpy(e->envs[i]->value, e->env[i] + k_len + 1);
-	}
-	else
-		e->env[i][k_len] = '\0';
-	e->env[e->size] = NULL;
+	e->env[i][k_len] = '=';
+	ft_strcpy(e->envs[i]->value, e->env[i] + k_len + 1);
 }
 
 int	check_key(char *key)
@@ -403,13 +398,13 @@ int	insert_env(t_envs *e, char *key, char *value)
 	index = search_env(e, key);
 	if (index == -1)
 	{
-		if (e->capa == e->size + 2)
+		if (e->capa == e->size + 1)
 		{
 			e->capa *= 2;
 			e->envs = (t_env **)ft_realloc(e->envs, sizeof(t_env *) * e->size,
-					sizeof(t_env *) * e->capa);
+					e->capa);
 			e->env = (char **)ft_realloc(e->env, sizeof(char *) * e->size,
-					sizeof(char *) * e->capa);
+					e->capa);
 		}
 		insert_new_env(e, key, value);
 	}
@@ -421,16 +416,8 @@ int	insert_env(t_envs *e, char *key, char *value)
 		e->envs[index]->value = value;
 		e->envs[index]->v_len = ft_strlen(value);
 	}
-	insert_main_env(e, index, key, value);
+	insert_char_env(e, index, key, value);
 	return (0);
-}
-
-void	delete_main_env(t_envs *e, int i, char *key)
-{
-	free(e->env[i]);
-	if (i != e->size)
-		e->env[i] = e->env[e->size];
-	e->env[e->size] = NULL;
 }
 
 int	delete_env(t_envs *e, char *key)
@@ -456,8 +443,6 @@ int	delete_env(t_envs *e, char *key)
 	if (index != e->size - 1)
 		e->envs[index] = e->envs[e->size - 1];
 	e->size -= 1;
-	e->envs[e->size] = NULL;
-	delete_main_env(e, index, key);
 	return (0);
 }
 
@@ -471,19 +456,18 @@ int main(int argc, char *argv[], char *env[])
 
 	if (input_env(&e, env) == 1)
 		return (1);
-	/* insert_env test*/
+	/* insert_env test
 	// insert 전에 check_key 후에 insert 사용
-	/*
 	insert_env(&e, "USER", NULL);
-	key = malloc(sizeof(char *) * 8);
+	key = malloc(sizeof(char *) * 7);
 	i = -1;
-	while (++i < 8)
+	while (++i < 7)
 	{
 		key[i] = malloc(sizeof(char) * 2);
 		key[i][0] = 'a' + i;
 		key[i][1] = '\0';
 	}
-	value = malloc(sizeof(char *) * 8);
+	value = malloc(sizeof(char *) * 7);
 	i = -1;
 	while (++i < 5)
 	{
@@ -492,17 +476,10 @@ int main(int argc, char *argv[], char *env[])
 		value[i][1] = '\0';
 	}
 	value[5] = NULL;
-	value[6] = malloc(sizeof(char) * 1);
-	value[6][0] = '\0';
-	value[7] = NULL;
+	value[6] = NULL;
 	i = -1;
 	while (++i < 7)
-	{
-		printf("key:%s\n", key[i]);
 		insert_env(&e, key[i], value[i]);
-	}
-	*/
-	/*
 	insert_env(&e, "1", "1");
 	insert_env(&e, "2", "1");
 	insert_env(&e, "3", "1");
@@ -513,7 +490,7 @@ int main(int argc, char *argv[], char *env[])
 	insert_env(&e, "USER", "swi2");
 	printf("%d:%d\n", e.capa, e.size);
 	*/
-	/* delete_env test*/
+	/* delete_env test
 	delete_env(&e, "SHELL");
 	delete_env(&e, "PWD");
 	delete_env(&e, "SHLVL");
@@ -521,23 +498,23 @@ int main(int argc, char *argv[], char *env[])
 	delete_env(&e, "__CF_USER_TEXT_ENCODING");
 	delete_env(&e, "sdjfk");
 	delete_env(&e, "COLORFGBG");
-	print_env(&e);
+	*/
+	//print_env(&e);
 	//print_export(&e);
-	/*
+
 	insert_env(&e, "1", "1");
+	printf("asdf\n");
+	fflush(0);
 	insert_env(&e, "2", "1");
 	insert_env(&e, "3", "1");
 	insert_env(&e, "4", "1");
 	insert_env(&e, "5", "1");
-	insert_env(&e, "6", "1");
-	insert_env(&e, "7", "1");
 	insert_env(&e, "USER", "swi2");
-	*/
-	printf("================\n");
 	i = -1;
 	while (e.env[++i] != NULL)
 		printf("%s\n", e.env[i]);
-	//printf("%s\n", get_env_value(&e, "PWD"));
+
+	printf("%s\n", get_env_value(&e, "PWD"));
 	free_envs(&e, AFT_KEY_SET);
 	return (0);
 }

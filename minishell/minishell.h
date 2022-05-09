@@ -15,11 +15,18 @@
 
 # define SIZE 2
 
-# define TEMP_FILE ".heredoc_temp"
+# define TEMP_FILE "/tmp/.heredoc_temp"
 
 # define OK 0
 # define ERROR 1
 # define WRONG_ACTION 2
+
+# define COMMAND_ERROR "command not found"
+# define ARG_NUM_ERROR "too many arguments"
+# define NUMERIC_ERROR "numeric argument required"
+# define NOT_VALID_ERROR "not a valid identifier"
+
+# define OVER_LONG_NUM 9223372036854775808UL
 
 /*
  * key: 환경변수의 key
@@ -29,6 +36,8 @@
  * k_len: key의 길이
  * v_len: value의 길이
  */
+
+//int	g_exit_code = 0;
 
 typedef struct s_env {
 	char			*key;
@@ -92,10 +101,13 @@ enum e_token {
 	T_STAR = '*'
 };
 
+void	print_error(char *a, char *b, char *c, char *d);
+
 void	*ft_realloc(void *ptr, int ptr_size, int new_size);
 int		ft_strlen(char *str);
 int		ft_strlen_c(char *str, char c);
 int		ft_strlcpy(char *str, char *target, int len);
+int		ft_strcpy(char *str, char *target);
 int		ft_strcmp(char *l, char *r);
 int		ft_max(int l, int r);
 
@@ -106,5 +118,6 @@ void	fill_array(char *org, char **words, char *div, int count);
 char	*make_oper_path(char *oper_path, char *path, char *oper);
 void	find_path(char ***paths, int *max_path);
 char	*make_oper(char ***opers, int max_path, char **paths, char *argv);
+void	exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
 
 #endif

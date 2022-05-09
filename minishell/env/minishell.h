@@ -10,8 +10,18 @@
 # include <dirent.h>
 # include <errno.h>
 # include <stdlib.h>
+# include <fcntl.h>
+# include <string.h>
 
 # define SIZE 2
+
+# define TEMP_FILE ".heredoc_temp"
+
+# define OK 0
+# define ERROR 1
+# define WRONG_ACTION 2
+
+# define COMMAND_ERROR "command not found"
 
 /*
  * key: 환경변수의 key
@@ -21,6 +31,8 @@
  * k_len: key의 길이
  * v_len: value의 길이
  */
+
+//int	g_exit_code = 0;
 
 typedef struct s_env {
 	char			*key;
@@ -56,15 +68,49 @@ typedef struct s_envs {
 	int		size;
 }	t_envs;
 
+typedef struct s_paths {
+	char	**paths;
+	int		max_len;
+}	t_paths;
+
+typedef struct s_oper {
+	char	*oper_path;
+	char	**opers;
+}	t_oper;
+
 typedef enum e_free_level {
 	BEF_KEY_SET,
 	AFT_KEY_SET
 }	t_flevel;
 
+enum e_token {
+	T_WORD,
+	T_QUOTE = '\'',
+	T_DQUOTE = '\"',
+	T_DOLLAR = '$',
+	T_RE_INPUT,
+	T_RE_OUTPUT,
+	T_RE_HEREDOC,
+	T_RE_APPEND_OUTPUT,
+	T_PIPE = '|',
+	T_STAR = '*'
+};
+
 void	*ft_realloc(void *ptr, int ptr_size, int new_size);
 int		ft_strlen(char *str);
 int		ft_strlen_c(char *str, char c);
 int		ft_strlcpy(char *str, char *target, int len);
+int		ft_strcpy(char *str, char *target);
 int		ft_strcmp(char *l, char *r);
+int		ft_max(int l, int r);
+
+void	*malloc_array(int size, int len);
+void	count_words_alloc(char ***paths, char *org, char div[], int *count);
+void	count_word_alloc(char *org, char **words, char *div, int *max_len);
+void	fill_array(char *org, char **words, char *div, int count);
+char	*make_oper_path(char *oper_path, char *path, char *oper);
+void	find_path(char ***paths, int *max_path);
+char	*make_oper(char ***opers, int max_path, char **paths, char *argv);
+void	exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
 
 #endif
