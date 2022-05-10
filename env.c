@@ -130,7 +130,7 @@ static void	insert_new_env(t_envs *e, char *key, char *value)
 	e->envs[e->size] = NULL;
 }
 
-static void	insert_main_env(t_envs *e, int i, char *key, char *value)
+static void	insert_main_env(t_envs *e, int i)
 {
 	int	k_len;
 	int	v_len;
@@ -192,7 +192,7 @@ int	insert_env(t_envs *e, char *key, char *value)
 			return (0);
 		change_exist_env(e, index, value);
 	}
-	insert_main_env(e, index, key, value);
+	insert_main_env(e, index);
 	return (0);
 }
 
@@ -219,7 +219,7 @@ char	*get_env_value(t_envs *e, char *key)
 	return (e->envs[i]->value);
 }
 
-static void	delete_main_env(t_envs *e, int i, char *key)
+static void	delete_main_env(t_envs *e, int i)
 {
 	free(e->env[i]);
 	if (i != e->size)
@@ -251,6 +251,6 @@ int	delete_env(t_envs *e, char *key)
 		e->envs[index] = e->envs[e->size - 1];
 	e->size -= 1;
 	e->envs[e->size] = NULL;
-	delete_main_env(e, index, key);
+	delete_main_env(e, index);
 	return (0);
 }

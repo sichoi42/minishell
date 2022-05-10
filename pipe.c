@@ -149,8 +149,6 @@ char	*make_oper(char ***opers, int max_path, char **paths, char *argv)
 	char		*oper_path;
 	int			max_oper;
 	int			count;
-	int			rtn;
-	struct stat	s;
 
 	count = 0;
 	count_words_alloc(opers, argv, " \t", &count);
@@ -162,18 +160,6 @@ char	*make_oper(char ***opers, int max_path, char **paths, char *argv)
 		free(oper_path);
 		oper_path = NULL;
 	}
-	/*
-	{
-		rtn = stat((*opers)[0], &s);
-		if (rtn != -1 && s.st_mode & S_IXUSR)
-			ft_strcpy((*opers)[0], oper_path);
-		else
-		{
-			free(oper_path);
-			oper_path = NULL;
-		}
-	}
-	*/
 	return (oper_path);
 }
 

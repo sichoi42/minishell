@@ -165,6 +165,7 @@ void	parsing(t_ast *tree, t_token *token_header, t_envs *e)
 void	execute_something(t_ast *node, t_envs *e)
 {
 	t_token	*t;
+	int		pipe_fd[2];
 
 	printf("tree_type: %s\n", get_tree_type_str(node->tree_type));
 	if (node->token != NULL)
@@ -172,6 +173,8 @@ void	execute_something(t_ast *node, t_envs *e)
 		t = node->token;
 		if (node->tree_type == TREE_CMD)
 		{
+			// 커맨드일 때, next가 있기 때문에
+			printf("command in: ");
 			while (t)
 			{
 				printf("%s ", t->s);
@@ -179,9 +182,15 @@ void	execute_something(t_ast *node, t_envs *e)
 			}
 			printf("\n");
 			printf("argc: %d\n", node->argc);
+			printf("pipe: %d\n", node->root->pipe_cnt);
+			printf("pwd: %s\n", e->pwd);
 		}
 		else
+		{
+			// 커맨드 그 외의 것들(pipe, redirection). next == NULL
+			printf("not command: ");
 			printf("%s\n", t->s);
+		}
 		print_token_list(t);
 	}
 	printf("------------------\n");
