@@ -22,6 +22,7 @@ char	*get_tree_type_str(enum e_tree_type tree_type)
 {
 	char	*s;
 
+	s = NULL;
 	if (tree_type == TREE_PIPE)
 		s = "TREE_PIPE";
 	else if (tree_type == TREE_BUNDLE)

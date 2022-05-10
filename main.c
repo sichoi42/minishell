@@ -100,13 +100,18 @@ int main(int argc, char **argv, char **envp)
 		{
 			init_token_header(&token_header);
 			if (tokenizing(line, token_header) == WRONG_ACTION)
+			{
 				printf("detected unclosed quote\n");
+				free_token(token_header);
+			}
 			else
+			{
 				print_token_list(token_header);
-			init_tree(&tree);
-			parsing(tree, token_header);
-			free_token(token_header);
-			free_tree(tree);
+				init_tree(&tree);
+				parsing(tree, token_header);
+				free_token(token_header);
+				free_tree(tree);
+			}
 			add_history(line);
 			free(line);
 			line = NULL;

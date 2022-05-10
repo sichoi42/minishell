@@ -18,6 +18,8 @@ void	print_token_str(enum e_token token)
 		printf("%s, ", "T_RE_HEREDOC");
 	if (token & T_RE_APPEND_OUTPUT)
 		printf("%s, ", "T_RE_APPEND_OUTPUT");
+	if (token & T_EXIT_CODE)
+		printf("%s, ", "T_EXIT_CODE");
 	printf("\n");
 }
 
@@ -80,7 +82,7 @@ void	free_token(t_token *t)
 }
 
 // s1과 s2의 최대 n개를 연결하여 반환하는 함수.(메모리 복제가 발생하고, s1은 free하지만 s2는 free하지 않음.)
-// s1과 s2는 힙영역에서 할당 받은 문자열로 가정하고 join후 둘을 free시킴.
+
 char	*ft_strnjoin(char *s1, char *s2, int len)
 {
 	char	*str;
@@ -95,7 +97,7 @@ char	*ft_strnjoin(char *s1, char *s2, int len)
 	if (s1 != NULL && s2 == NULL)
 	{
 		free(s1);
-		return (ft_strdup(s1, len));
+		return (ft_strndup(s1, len));
 	}
 	str = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (str == NULL)
@@ -110,7 +112,7 @@ char	*ft_strnjoin(char *s1, char *s2, int len)
 	{
 		if (s2[j] != '\\' || (j > 0 && s2[j - 1] == '\\' && s2[j] == '\\'))
 		{
-			str[n + i] = str[j];
+			str[n + i] = s2[j];
 			++i;
 		}
 		++j;

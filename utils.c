@@ -13,13 +13,16 @@ int	ft_strlen(char *s)
 	return (i);
 }
 
+
 char	*ft_strchr(char *s, char c)
 {
+	int	i;
+
+	i = 0;
 	while (*s)
 	{
 		if (*s == c)
-			if (*(s - 1) != '\\')
-				return ((char *)s);
+			return ((char *)s);
 		++s;
 	}
 	return (NULL);

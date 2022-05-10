@@ -181,7 +181,7 @@ void	execute_something(t_ast *node)
 
 void	tree_searching(t_ast *node)
 {
-	execute_something(node);
+	// execute_something(node);
 	if (node->left != NULL)
 		tree_searching(node->left);
 	if (node->right != NULL)
