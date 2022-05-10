@@ -67,9 +67,8 @@ typedef struct s_redirect
 // utils.c
 int	ft_strlen(char *s);
 char	*ft_strndup(char *src, int len);
-int	is_space(char c);
-char	*ft_strchr(char *s, char c);
 char	*ft_strdup(char *src);
+int		is_space(char c);
 
 // in tokenize
 
@@ -79,18 +78,20 @@ void	print_type_str(enum e_type type);
 void	print_token_list(t_token *t);
 void	free_token(t_token *t);
 char	*ft_strnjoin(char *s1, char *s2, int len);
+char	*ft_strchr(char *s, char c);
+char	*ft_strchr_ig_blsh(char *s, char *c, char **end);
 
 // tokenize.c
 char *get_env(char **start, char *end);
 char *split_word_in_dollar(char **start, char **end, enum e_token *token);
 char *split_word_in_quote(char **start, char **end, enum e_token *token);
-void	move_quote_end(char *line, char **start, char **end);
-t_token *split_word(char *line, char **start, char **end, enum e_token *token);
+void move_quote_end(char **start, char **end);
+t_token *split_word(char **start, char **end, enum e_token *token);
 void get_redirect_token(char **start, char **end, enum e_token *token);
 t_token *split_pipe(char **end, enum e_token *token);
 t_token *split_star(char **end, enum e_token *token);
 void moving_two_pointers(char **start, char **end);
-t_token *split_redirect(char *line, char **start, char **end, enum e_token *token);
+t_token	*split_redirect(char **start, char **end, enum e_token *token);
 int tokenizing(char *line, t_token *t);
 
 // in parsing

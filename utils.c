@@ -13,21 +13,6 @@ int	ft_strlen(char *s)
 	return (i);
 }
 
-
-char	*ft_strchr(char *s, char c)
-{
-	int	i;
-
-	i = 0;
-	while (*s)
-	{
-		if (*s == c)
-			return ((char *)s);
-		++s;
-	}
-	return (NULL);
-}
-
 char	*ft_strdup(char *src)
 {
 	char	*dst;
@@ -80,13 +65,12 @@ char	*ft_strndup(char *src, int len)
 	return (dst);
 }
 
-
-// int	is_space(char c)
-// {
-// 	if (c == ' ' || c == '\n' || c == '\t' || c == '\v' || c == '\f' || c == '\r')
-// 		return (1);
-// 	return (0);
-// }
+int	is_space(char c)
+{
+	if (c == ' ' || c == '\n' || c == '\t' || c == '\v' || c == '\f' || c == '\r')
+		return (1);
+	return (0);
+}
 
 // char	*ft_strchr(char *s, int c)
 // {

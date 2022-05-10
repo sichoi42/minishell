@@ -121,3 +121,34 @@ char	*ft_strnjoin(char *s1, char *s2, int len)
 	free(s1);
 	return (str);
 }
+
+char	*ft_strchr(char *s, char c)
+{
+	int	i;
+
+	i = 0;
+	while (*s)
+	{
+		if (*s == c)
+			return ((char *)s);
+		++s;
+	}
+	return (NULL);
+}
+
+char	*ft_strchr_ig_blsh(char *s, char *c, char **end)
+{
+	int	i;
+
+	i = 0;
+	while (*s)
+	{
+		if (*c == '\\')
+			if (*(c + 1) && *s == *(c + 1))
+				++(*end);
+		if (*s == *c)
+			return ((char *)s);
+		++s;
+	}
+	return (NULL);
+}

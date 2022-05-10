@@ -17,10 +17,9 @@ char	*split_word_in_dollar(char **start, char **end, enum e_token *token)
 	char	*value;
 
 	++(*end);
-	if (**end == 0 || ft_strchr(" \"\'|><\\", **end))
+	if (**end == 0 || ft_strchr(" \"\'|><\\$", **end))
 	{
 		s = ft_strdup("$");
-		++(*end);
 	}
 	else if (**end == '?')
 	{
@@ -30,7 +29,7 @@ char	*split_word_in_dollar(char **start, char **end, enum e_token *token)
 	}
 	else
 	{
-		while (**end && !ft_strchr(" \"\'|><\\$", **end))
+		while (**end && !ft_strchr_ig_blsh(" \"\'|><\\$", *end, end))
 			++(*end);
 		value = get_env(start, *end);
 		s = ft_strndup(value, ft_strlen(value));
@@ -62,7 +61,7 @@ char	*split_word_in_quote(char **start, char **end, enum e_token *token)
 			}
 			else
 			{
-				while (*d_end && !ft_strchr(" \"\'|><\\$", *d_end))
+				while (*d_end && !ft_strchr_ig_blsh(" \"\'|><\\$", d_end, &d_end))
 					++d_end;
 				value = get_env(start, d_end);
 				s = ft_strnjoin(s, value, ft_strlen(value));
@@ -80,9 +79,8 @@ char	*split_word_in_quote(char **start, char **end, enum e_token *token)
 	return (s);
 }
 
-void	move_quote_end(char *line, char **start, char **end)
+void	move_quote_end(char **start, char **end)
 {
-	(void)line;
 	while (**end)
 	{
 		if (**end == **start)
@@ -94,7 +92,7 @@ void	move_quote_end(char *line, char **start, char **end)
 	}
 }
 
-t_token	*split_word(char *line, char **start, char **end, enum e_token *token)
+t_token	*split_word(char **start, char **end, enum e_token *token)
 {
 	t_token	*new;
 	char	*s;
@@ -110,7 +108,7 @@ t_token	*split_word(char *line, char **start, char **end, enum e_token *token)
 	{
 		if (**end && !ft_strchr("\"\'$", **end)) // 일반문자인 경우
 		{
-			while (**end && !ft_strchr(" \"\'$|><", **end)) // 일반문자 사이 offset 구함.
+			while (**end && !ft_strchr_ig_blsh(" \"\'$|><", *end, end)) // 일반문자 사이 offset 구함.
 				++(*end);
 			s = ft_strnjoin(s, *start, *end - *start); // 일반문자열 join.
 			*start = *end;
@@ -118,7 +116,7 @@ t_token	*split_word(char *line, char **start, char **end, enum e_token *token)
 		if (**end && ft_strchr("\"\'", **end)) // quote인 경우
 		{
 			++(*end);
-			move_quote_end(line, start, end); // quote 사이 offset 구함.
+			move_quote_end(start, end); // quote 사이 offset 구함.
 			if (**end == 0) // unclosed quote일 경우 예외 처리.
 			{
 				free(s);
@@ -213,12 +211,12 @@ t_token	*split_star(char **end, enum e_token *token)
 
 void	moving_two_pointers(char **start, char **end)
 {
-	while (**end && ft_strchr(" ", **end))
+	while (**end && is_space(**end))
 		++(*end);
 	*start = *end;
 }
 
-t_token	*split_redirect(char *line, char **start, char **end, enum e_token *token)
+t_token	*split_redirect(char **start, char **end, enum e_token *token)
 {
 	t_token	*new;
 
@@ -229,7 +227,7 @@ t_token	*split_redirect(char *line, char **start, char **end, enum e_token *toke
 	else if (ft_strchr("*", **start))
 		new = split_star(end, token);
 	else
-		new = split_word(line, start, end, token);
+		new = split_word(start, end, token);
 	new->type |= REDIRECT;
 	new->type &= ~ARGS;
 	return (new);
@@ -253,13 +251,13 @@ int	tokenizing(char *line, t_token *t)
 		if (*start)
 		{
 			if (ft_strchr("><", *start))
-				new = split_redirect(line, &start, &end, &token);
+				new = split_redirect(&start, &end, &token);
 			else if (ft_strchr("|", *start))
 				new = split_pipe(&end, &token);
 			else if (ft_strchr("*", *start))
 				new = split_star(&end, &token);
 			else // word, quote, $
-				new = split_word(line, &start, &end, &token);
+				new = split_word(&start, &end, &token);
 			if (new == NULL)
 				return (WRONG_ACTION);
 			p->next = new;
