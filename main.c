@@ -110,7 +110,7 @@ int main(int argc, char **argv, char **envp)
 			{
 				print_token_list(token_header);
 				init_tree(&tree);
-				parsing(tree, token_header);
+				parsing(tree, token_header, &e);
 				free_token(token_header);
 				free_tree(tree);
 			}
