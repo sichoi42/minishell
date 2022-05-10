@@ -114,16 +114,6 @@ void	*ft_realloc(void *ptr, int ptr_size, int new_size)
 	return (temp);
 }
 
-int	ft_strlen(char *str)
-{
-	int	len;
-
-	len = 0;
-	while (*str++ != '\0')
-		++len;
-	return (len);
-}
-
 int	ft_strlen_c(char *str, char c)
 {
 	int	len;

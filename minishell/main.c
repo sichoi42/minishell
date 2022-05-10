@@ -81,7 +81,7 @@ int main(int argc, char *argv[], char *env[])
 	free_double_char(o.opers);// 매 번들마다.
 	free(o.oper_path);//매 번들마다.
 
-	free_envs(&e, AFT_KEY_SET);//bash 종료시에.
+	free_envs(&e);//bash 종료시에.
 	free_double_char(p.paths);// bash 종료시에.
 	return (0);
 }
