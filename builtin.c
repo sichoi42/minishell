@@ -100,9 +100,7 @@ static int	error_key(char *oper, char *arg)
 int	ft_unset(t_oper *o, t_envs *e)
 {
 	int		i;
-	int		len;
 	int		rtn;
-	char	*e_oper;
 
 	i = 0;
 	rtn = OK;
@@ -154,7 +152,6 @@ int	ft_export(t_oper *o, t_envs *e)
 {
 	int		i;
 	int		rtn;
-	char	*e_oper;
 	char	*key;
 	char	*value;
 
