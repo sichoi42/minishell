@@ -29,7 +29,7 @@
 // type: PIPE
 // ----------
 // grep
-// token: WORD
+// token: WORD2
 // type: ARGS
 // ----------
 // abc

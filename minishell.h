@@ -175,10 +175,10 @@ int syntax_bundle(t_ast *node, t_token *t, t_ast *root);
 int syntax_redirect(t_ast *node, t_token *t, t_ast *root);
 void syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root);
 int syntax_cmd(t_ast *node, t_token *t, t_ast *root);
-void parsing(t_ast *tree, t_token *token_header);
-void execute_something(t_ast *node);
-void tree_searching(t_ast *node);
-void free_tree(t_ast *node);
+void parsing(t_ast *tree, t_token *token_header, t_envs *e);
+void execute_something(t_ast *node, t_envs *e);
+void tree_searching(t_ast *node, t_envs *e);
+void free_tree(t_ast *node, t_envs *e);
 
 // utils.c
 t_token	*ft_token_dup(t_token *src);
