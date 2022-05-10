@@ -178,7 +178,7 @@ int syntax_cmd(t_ast *node, t_token *t, t_ast *root);
 void parsing(t_ast *tree, t_token *token_header, t_envs *e);
 void execute_something(t_ast *node, t_envs *e);
 void tree_searching(t_ast *node, t_envs *e);
-void free_tree(t_ast *node, t_envs *e);
+void free_tree(t_ast *node);
 
 // utils.c
 t_token	*ft_token_dup(t_token *src);

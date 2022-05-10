@@ -11,7 +11,10 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 		node = node->right;
 	if (t->type & PIPE)
 	{
-		++(node->root->pipe_cnt);
+		if (node->root->pipe_cnt == -1)
+			node->root->pipe_cnt = 1;
+		else
+			++(node->root->pipe_cnt);
 		node->right = malloc(sizeof(t_ast));
 		if (node->right == NULL)
 			return (-1);
