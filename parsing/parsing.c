@@ -165,7 +165,6 @@ void	parsing(t_ast *tree, t_token *token_header, t_envs *e)
 void	execute_something(t_ast *node, t_envs *e)
 {
 	t_token	*t;
-	int		pipe_fd[2];
 
 	printf("tree_type: %s\n", get_tree_type_str(node->tree_type));
 	if (node->token != NULL)

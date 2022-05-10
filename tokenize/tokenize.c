@@ -22,6 +22,8 @@ char	*split_word_in_dollar(char **start, char **end, enum e_token *token, t_envs
 	++(*end);
 	if (**end == 0 || ft_strchr(" \"\'|><\\$", **end))
 	{
+		if (ft_strchr("\"\'", **end))
+			s = ft_strdup("");
 		s = ft_strdup("$");
 	}
 	else if (**end == '?')
@@ -63,10 +65,17 @@ char	*split_word_in_quote(char **start, char **end, enum e_token *token, t_envs 
 				++d_end;
 				s = ft_strnjoin(s, "$?", 2);
 			}
+			else if (ft_strchr(" \"\'|><\\$", *d_end))
+			{
+				if (ft_strchr("\"\'", **end))
+					s = ft_strdup("");
+				s = ft_strdup("$");
+			}
 			else
 			{
 				while (*d_end && !ft_strchr_ig_blsh(" \"\'|><\\$", d_end, &d_end))
 					++d_end;
+				++(*start);
 				value = get_env(start, d_end, e);
 				s = ft_strnjoin(s, value, ft_strlen(value));
 				free(value);
@@ -144,7 +153,7 @@ t_token	*split_word(char **start, char **end, enum e_token *token, t_envs *e)
 		}
 	}
 	if (s == NULL)
-		return (NULL);
+		s = ft_strdup("");
 	new->s = s;
 	*token |= T_WORD;
 	new->type = ARGS;
