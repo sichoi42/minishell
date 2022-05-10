@@ -11,7 +11,10 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 		node = node->right;
 	if (t->type & PIPE)
 	{
-		++(node->root->pipe_cnt);
+		if (node->root->pipe_cnt == -1)
+			node->root->pipe_cnt = 1;
+		else
+			++(node->root->pipe_cnt);
 		node->right = malloc(sizeof(t_ast));
 		if (node->right == NULL)
 			return (-1);
@@ -146,7 +149,7 @@ int	syntax_cmd(t_ast *node, t_token *t, t_ast *root)
 	return (0);
 }
 
-void	parsing(t_ast *tree, t_token *token_header)
+void	parsing(t_ast *tree, t_token *token_header, t_envs *e)
 {
 	t_token	*p;
 
@@ -156,10 +159,10 @@ void	parsing(t_ast *tree, t_token *token_header)
 		syntax_pipe(tree, p, tree->root);
 		p = p->next;
 	}
-	tree_searching(tree);
+	tree_searching(tree, e);
 }
 
-void	execute_something(t_ast *node)
+void	execute_something(t_ast *node, t_envs *e)
 {
 	t_token	*t;
 
@@ -184,13 +187,13 @@ void	execute_something(t_ast *node)
 	printf("------------------\n");
 }
 
-void	tree_searching(t_ast *node)
+void	tree_searching(t_ast *node, t_envs *e)
 {
-	execute_something(node);
+	execute_something(node, e);
 	if (node->left != NULL)
-		tree_searching(node->left);
+		tree_searching(node->left, e);
 	if (node->right != NULL)
-		tree_searching(node->right);
+		tree_searching(node->right, e);
 }
 
 void	free_tree(t_ast	*node)

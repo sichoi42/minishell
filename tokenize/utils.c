@@ -61,23 +61,17 @@ void	free_token(t_token *t)
 
 	if (t)
 	{
-		p = t;
+		p = t->next;
 		while (p)
 		{
-			if (p->next)
-			{
-				tmp = p->next;
-				free(p->s);
-				free(p);
-				p = tmp;
-			}
-			else
-			{
-				free(p->s);
-				free(p);
-			}
-			p = p->next;
+			tmp = p->next;
+			free(p->s);
+			free(p);
+			p = tmp;
 		}
+		if (t->s)
+			free(t->s);
+		free(t);
 	}
 }
 
