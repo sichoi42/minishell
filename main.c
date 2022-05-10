@@ -76,7 +76,7 @@ void	init_tree(t_ast **tree)
 	(*tree)->left = NULL;
 	(*tree)->right = NULL;
 	(*tree)->tree_type = TREE_PIPE;
-	(*tree)->pipe_cnt = 0;
+	(*tree)->pipe_cnt = -1;
 	(*tree)->root = *tree;
 }
 
@@ -110,7 +110,7 @@ int main(int argc, char **argv, char **envp)
 			{
 				print_token_list(token_header);
 				init_tree(&tree);
-				parsing(tree, token_header);
+				parsing(tree, token_header, &e);
 				free_token(token_header);
 				free_tree(tree);
 			}
