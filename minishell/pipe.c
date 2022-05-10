@@ -1,24 +1,9 @@
 #include "minishell.h"
-
-void	*malloc_array(int size, int len)
-{
-	void	*temp;
-
-	temp = malloc(size * len);
-	if (temp == NULL)
-	{
-		print_error("bash", strerror(errno), NULL, NULL);
-		exit(1);
-	}
-	return (temp);
-}
-
-int	ft_max(int l, int r)
-{
-	if (l > r)
-		return (l);
-	return (r);
-}
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <sys/stat.h>
 
 void	count_words_alloc(char ***paths, char *org, char div[], int *count)
 {
@@ -130,7 +115,7 @@ void	find_path(char ***paths, int *max_path)
 	fill_array(path, *paths, ":", count);
 }
 
-int	check_right_path(char **o_path, char **paths, char *oper)
+static int	check_right_path(char **o_path, char **paths, char *oper)
 {
 	struct stat		s;
 	int				i;

@@ -1,6 +1,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+/*
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
@@ -12,8 +13,9 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <string.h>
+*/
 
-# define SIZE 2
+# define SIZE 2048
 
 # define TEMP_FILE "/tmp/.heredoc_temp"
 
@@ -37,7 +39,7 @@
  * v_len: value의 길이
  */
 
-//int	g_exit_code = 0;
+int	g_exit_code;
 
 typedef struct s_env {
 	char			*key;
@@ -103,24 +105,60 @@ enum e_token {
 	T_STAR = '*'
 };
 
-void	print_error(char *a, char *b, char *c, char *d);
+// basic.c
+void				print_error(char *a, char *b, char *c, char *d);
+void				*malloc_array(int size, int len);
+int					ft_max(int l, int r);
+unsigned long long	ft_atoi(const char *str);
+void				*ft_realloc(void *ptr, int ptr_size, int new_size);
+int					ft_strlen(char *str);
+int					ft_strlen_c(char *str, char c);
+int					ft_strlcpy(char *str, char *target, int len);
+int					ft_strcpy(char *str, char *target);
+int					ft_strlcmp(char *l, char *r, int len);
+int					ft_strcmp(char *l, char *r);
+void				ft_tolower(char **str);
+char				*ft_strcat(char *org, char *target);
 
-void	*ft_realloc(void *ptr, int ptr_size, int new_size);
-int		ft_strlen(char *str);
-int		ft_strlen_c(char *str, char c);
-int		ft_strlcpy(char *str, char *target, int len);
-int		ft_strcpy(char *str, char *target);
-int		ft_strlcmp(char *l, char *r, int len);
-int		ft_strcmp(char *l, char *r);
-int		ft_max(int l, int r);
+// free.c
+void				free_envs(t_envs *e, t_flevel level);
+void				free_double_char(char **dptr);
 
-void	*malloc_array(int size, int len);
-void	count_words_alloc(char ***paths, char *org, char div[], int *count);
-void	count_word_alloc(char *org, char **words, char *div, int *max_len);
-void	fill_array(char *org, char **words, char *div, int count);
-char	*make_oper_path(char *oper_path, char *path, char *oper);
-void	find_path(char ***paths, int *max_path);
-char	*make_oper(char ***opers, int max_path, char **paths, char *argv);
-void	exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
+// input_env.c
+int					input_env(t_envs *e, char *env[]);
+
+// builtin.c
+int					ft_pwd(void);
+int					ft_exit(t_oper *o);
+int					ft_env(t_envs *e);
+int					ft_unset(t_oper *o, t_envs *e);
+int					ft_export(t_oper *o, t_envs *e);
+int					ft_echo(t_oper *o);
+int					ft_cd(t_oper *o, t_envs *e);
+int					built_in_check(t_oper *o, t_envs *e);
+
+// env.c
+void				print_export(t_envs *e);
+void				print_env(t_envs *e);
+void				set_env_lr(t_envs *e, char *key, int index);
+int					insert_env(t_envs *e, char *key, char *value);
+int					search_env(t_envs *e, char *key);
+char				*get_env_value(t_envs *e, char *key);
+int					delete_env(t_envs *e, char *key);
+
+// redirect.c
+int					dup_check(int fd_l, int fd_r);
+int					red_open_file(enum e_token t, char *f_name);
+void				init_pipe(int *pipe_fd);
+int					make_pipe(int *p_fd);
+
+// pipe.c
+void				count_words_alloc(char ***paths, char *org, char div[], int *count);
+void				count_word_alloc(char *org, char **words, char *div, int *max_len);
+void				fill_array(char *org, char **words, char *div, int count);
+char				*make_oper_path(char *oper_path, char *path, char *oper);
+void				find_path(char ***paths, int *max_path);
+char				*make_oper(char ***opers, int max_path, char **paths, char *argv);
+void				exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
 
 #endif
