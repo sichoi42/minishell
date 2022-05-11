@@ -151,6 +151,7 @@ void	print_type_str(enum e_type type);
 void	print_token_list(t_token *t);
 void	free_token(t_token *t);
 char	*ft_strnjoin(char *s1, char *s2, int len);
+char	*ft_strnjoin_in_quote(char *s1, char *s2, int len);
 char	*ft_strchr(char *s, char c);
 char	*ft_strchr_ig_blsh(char *s, char *c, char **end);
 

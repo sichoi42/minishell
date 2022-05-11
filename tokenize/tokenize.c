@@ -8,7 +8,6 @@ char	*get_env(char **start, char *end, t_envs *e)
 	char	*value;
 
 	key = ft_strndup(*start, end - *start);
-	printf("%s\n", key);
 	value = ft_strdup(get_env_value(e, key));
 	free(key);
 	return (value);
@@ -17,29 +16,27 @@ char	*get_env(char **start, char *end, t_envs *e)
 char	*split_word_in_dollar(char **start, char **end, enum e_token *token, t_envs *e)
 {
 	char	*s;
-	char	*value;
 
 	++(*end);
-	if (**end == 0 || ft_strchr(" \"\'|><\\$", **end))
+	if (**end == 0 || ft_strchr(" \"\'|><\\$", **end)) // $다음이 null이거나 특수문자이면,
 	{
-		if (ft_strchr("\"\'", **end))
+		if (ft_strchr("\"\'", **end)) // $다음이 quote일 경우, 빈 문자열 할당.
 			s = ft_strdup("");
-		s = ft_strdup("$");
+		else
+			s = ft_strdup("$"); // 그 외는 $만 할당
 	}
-	else if (**end == '?')
+	else if (**end == '?') // $다음이 ?일 때,
 	{
-		s = ft_strndup("$?", 2);
+		s = ft_strndup("$?", 2); // $?를 할당하고 T_EXIT_CODE 토큰 추가.
 		*token |= T_EXIT_CODE;
 		++(*end);
 	}
-	else
+	else // $다음이 일반 문자인 경우, key값을 알아내기 위해 문자의 끝 위치 찾아감.
 	{
 		while (**end && !ft_strchr_ig_blsh(" \"\'|><\\$", *end, end))
 			++(*end);
 		++(*start);
-		value = get_env(start, *end, e);
-		s = ft_strndup(value, ft_strlen(value));
-		free(value);
+		s = get_env(start, *end, e); // key로 value값을 받아옴.
 	}
 	return (s);
 }
@@ -54,24 +51,25 @@ char	*split_word_in_quote(char **start, char **end, enum e_token *token, t_envs 
 	s = NULL;
 	quote = **start;
 	++(*start);
+	// start가 end문자가 될 때까지 인덱스를 넘기되, 중간에 bkslsh quote를 만나면 무시.
 	while (**start != **end || (**start == quote && *(*start - 1) == '\\'))
 	{
-		if (**start == '$' && quote == '\"')
+		if (**start == '$' && quote == '\"') // double quote안에서 $를 만났을 때,
 		{
 			d_end = *start + 1;
-			if (*d_end == '?')
+			if (*d_end == '?') // $다음이 ?인 경우 T_EXIT_CODE 토큰을 추가하고 $? 문자열 반환.
 			{
 				*token |= T_EXIT_CODE;
 				++d_end;
 				s = ft_strnjoin(s, "$?", 2);
 			}
-			else if (ft_strchr(" \"\'|><\\$", *d_end))
+			else if (ft_strchr(" \"\'|><\\$", *d_end)) // $다음이 특수 문자가 아닌 일반 문자인 경우,
 			{
-				if (ft_strchr("\"\'", **end))
-					s = ft_strdup("");
-				s = ft_strdup("$");
+				if (ft_strchr("\"\'", **end)) // $다음이 quote인 경우, 빈 문자열 추가. 그 외는 $그대로 처리.
+					s = ft_strnjoin(s, "", 1);
+				s = ft_strnjoin(s, "$", 1);
 			}
-			else
+			else // $다음이 일반 문자인 경우, key값을 알아내기 위해 문자의 끝 위치 찾아감.
 			{
 				while (*d_end && !ft_strchr_ig_blsh(" \"\'|><\\$", d_end, &d_end))
 					++d_end;

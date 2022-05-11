@@ -90,8 +90,9 @@ char	*ft_strnjoin(char *s1, char *s2, int len)
 	}
 	if (s1 != NULL && s2 == NULL)
 	{
+		str = ft_strndup(s1, len);
 		free(s1);
-		return (ft_strndup(s1, len));
+		return (str);
 	}
 	str = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (str == NULL)
