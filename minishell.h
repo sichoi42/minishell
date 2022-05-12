@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
+/*   Updated: 2022/05/12 19:05:26 by sichoi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -135,14 +147,7 @@ typedef struct s_oper {
 int	g_exit_code;
 
 
-// sichoi
-// =================================================================================================
-// utils.c
-int	ft_strlen(char *s);
-char	*ft_strndup(char *src, int len);
-char	*ft_strdup(char *src);
-int		is_space(char c);
-
+// ===========================================sichoi================================================
 
 // ====================================In tokenize directory========================================
 
@@ -187,25 +192,34 @@ char	*ft_strchr(char *s, char c);
 t_token	*create_new_token(void);
 
 
-// in parsing
+// ==================================In parsing directory===========================================
 
-// parsing.c
-int syntax_pipe(t_ast *node, t_token *t, t_ast *root);
-int syntax_bundle(t_ast *node, t_token *t, t_ast *root);
-int syntax_redirect(t_ast *node, t_token *t, t_ast *root);
-void syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root);
-int syntax_cmd(t_ast *node, t_token *t, t_ast *root);
-void parsing(t_ast *tree, t_token *token_header, t_envs *e);
-void execute_something(t_ast *node, t_envs *e);
-void tree_searching(t_ast *node, t_envs *e);
-void free_tree(t_ast *node);
+// ------------------------------------parsing.c----------------------------------------------------
+void	parsing(t_ast *tree, t_token *token_header, t_envs *e);
+void	execute_something(t_ast *node, t_envs *e);
+void	tree_searching(t_ast *node, t_envs *e);
 
-// utils.c
+// -----------------------------------syntax_analysis.c---------------------------------------------
+int		syntax_pipe(t_ast *node, t_token *t, t_ast *root);
+int		syntax_bundle(t_ast *node, t_token *t, t_ast *root);
+int		syntax_redirect(t_ast *node, t_token *t, t_ast *root);
+void	syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root);
+int		syntax_cmd(t_ast *node, t_token *t, t_ast *root);
+
+// -----------------------------------parse_utils.c-------------------------------------------------
+t_ast	*create_new_node(t_ast *root, enum e_tree_type tree_type);
 t_token	*ft_token_dup(t_token *src);
 char	*get_tree_type_str(enum e_tree_type tree_type);
+void	free_tree(t_ast *node);
+
 // ==================================================================
 
 
+// utils.c
+int		ft_strlen(char *s);
+char	*ft_strndup(char *src, int len);
+char	*ft_strdup(char *src);
+int		is_space(char c);
 
 
 
