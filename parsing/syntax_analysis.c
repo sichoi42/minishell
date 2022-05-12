@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 19:03:00 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 19:03:30 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/12 19:08:50 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 	}
 	else
 	{
-		if (node->left == NULL) // bundle에 최초 방문 시,
+		if (node->left == NULL)
 			node->left = create_new_node(root, TREE_BUNDLE);
 		if (syntax_bundle(node->left, t, root) == -1)
 			return (-1);
@@ -43,13 +43,13 @@ int	syntax_bundle(t_ast *node, t_token *t, t_ast *root)
 {
 	if (t->type & ARGS || t->type & STAR)
 	{
-		if (node->right == NULL) // cmd로 최초 방문 시,
+		if (node->right == NULL)
 			node->right = create_new_node(root, TREE_CMD);
 		syntax_cmd(node->right, t, root);
 	}
 	else if (t->type & REDIRECT)
 	{
-		if (node->left == NULL) // redirect로 최초 방문 시,
+		if (node->left == NULL)
 			node->left = create_new_node(root, TREE_RE);
 		syntax_redirect(node->left, t, root);
 	}
@@ -97,7 +97,7 @@ int	syntax_cmd(t_ast *node, t_token *t, t_ast *root)
 	(void)root;
 	if (node->token == NULL)
 	{
-		node->token = ft_token_dup(t); // 메모리를 복사.
+		node->token = ft_token_dup(t);
 		node->argc = 1;
 	}
 	else
