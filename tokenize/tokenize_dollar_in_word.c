@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tokenize_word_in_dollar.c                          :+:      :+:    :+:   */
+/*   tokenize_dollar_in_word.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 20:57:57 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/11 21:56:59 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/12 18:16:05 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 #include <stdlib.h>
 
+// key를 넣으면 value를 dup하여 반환.
 char	*key_to_value(char **start, char *end, t_envs *e)
 {
 	char	*key;
@@ -24,54 +25,62 @@ char	*key_to_value(char **start, char *end, t_envs *e)
 	return (value);
 }
 
-char	*tokenize_word_in_dollar(char **start, char **end, enum e_token *token, t_envs *e)
+// word에서 만나는 dollar를 처리하는 함수.
+// $다음이 다른 토큰(pipe, redirect)이면 $를 문자 그대로 해석.
+// $다음이 ?이면 EXIT_CODE처리를 위한 토큰을 추가.
+// $다음이 일반문자면 해당 환경변수의 value를 가져옴.
+char	*dollar_in_word(char **start, char **end, enum e_token *t, t_envs *e)
 {
 	char	*s;
 
 	++(*end);
-	if (**end == 0 || is_space(**end) || ft_strchr("\"\'|><$", **end)) // $다음이 null이거나 특수문자인 경우,
+	if (**end == 0 || is_space(**end) || ft_strchr("\"\'|><$", **end))
 	{
-		if (ft_strchr("\"\'", **end)) // $다음이 quote일 경우, 빈 문자열 할당.
+		if (ft_strchr("\"\'", **end))
 			s = ft_strdup("");
 		else
-			s = ft_strdup("$"); // 그 외는 $만 할당
+			s = ft_strdup("$");
 	}
-	else if (**end == '?') // $ 다음이 ?일 때,
+	else if (**end == '?')
 	{
-		s = ft_strndup("$?", 2); // $?를 할당하고 T_EXIT_CODE 토큰 추가.
-		*token |= T_EXIT_CODE;
+		s = ft_strndup("$?", 2);
+		*t |= T_EXIT_CODE;
 		++(*end);
 	}
-	else // $다음이 일반문자인 경우, key값을 알아내기 위해 문자의 끝 위치 찾아감.
+	else
 	{
 		while (**end && !is_space(**end) && !ft_strchr("\"\'|><$", **end))
 			++(*end);
 		++(*start);
-		s = key_to_value(start, *end, e); // key로 value값을 받아옴.
+		s = key_to_value(start, *end, e);
 	}
 	*start = *end;
 	return (s);
 }
 
-char	*tokenize_word_in_quote_in_dollar(char **start, char **end, enum e_token *token, t_envs *e)
+// quote안에서 만나는 dollar를 처리하는 함수.
+// $다음이 다른 토큰(pipe, redirect)이면 $를 문자 그대로 해석.
+// $다음이 ?이면 EXIT_CODE처리를 위한 토큰을 추가.
+// $다음이 일반문자면 해당 환경변수의 value를 가져옴.
+char	*dollar_in_quote(char **start, char **end, enum e_token *t, t_envs *e)
 {
 	char	*d_end;
 	char	*s;
 
 	d_end = *start + 1;
-	if (*d_end == '?') // $다음이 ?인 경우 T_EXIT_CODE 토큰을 추가하고 $? 문자열 반환.
+	if (*d_end == '?')
 	{
-		*token |= T_EXIT_CODE;
+		*t |= T_EXIT_CODE;
 		++d_end;
 		s = ft_strdup("$?");
 	}
-	else if (is_space(*d_end) || ft_strchr("\"\'|><$", *d_end)) // $다음이 특수 문자인 경우
+	else if (is_space(*d_end) || ft_strchr("\"\'|><$", *d_end))
 	{
-		if (ft_strchr("\"\'", **end)) // $다음이 quote인 경우, 빈 문자열 추가. 그 외는 $그대로 처리.
+		if (ft_strchr("\"\'", **end))
 			s = ft_strdup("");
 		s = ft_strdup("$");
 	}
-	else // $다음이 일반 문자인 경우, key값을 알아내기 위해 문자의 끝 위치 찾아감.
+	else
 	{
 		while (*d_end && !is_space(*d_end) && !ft_strchr("\"\'|><$", *d_end))
 			++d_end;

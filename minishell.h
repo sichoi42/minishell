@@ -38,13 +38,13 @@ enum e_type
 	PIPE = 1 << 2,
 	ARGS = 1 << 3,
 	STAR = 1 << 4
-}	t_type;
+};
 
 // parse tree의 type
 enum e_tree_type
 {
 	TREE_PIPE, TREE_BUNDLE, TREE_RE, TREE_CMD
-}	t_tree_type;
+};
 
 // 각 토큰들을 linked list로 저장.
 typedef struct	s_token
@@ -148,6 +148,7 @@ int		is_space(char c);
 
 // ------------------------------------tokenize.c---------------------------------------------------
 void	moving_two_pointers(char **start, char **end);
+t_token	*token_split(char **start, char **end, enum e_token *token, t_envs *e);
 int		tokenizing(char *line, t_token *t, t_envs *e);
 
 // ------------------------------------tokenize_word.c----------------------------------------------
@@ -157,17 +158,17 @@ t_token	*treat_unclosed_quote(t_token **new, char **s);
 void	fill_word_info(t_token **new, char *s, enum e_token *token);
 t_token	*tokenize_word(char **start, char **end, enum e_token *token, t_envs *e);
 
-// ------------------------------------tokenize_word_in_quote.c-------------------------------------
-char	*tokenize_word_in_quote(char **start, char **end, enum e_token *token, t_envs *e);
+// ------------------------------------tokenize_quote_in_word.c-------------------------------------
+char	*quote_in_word(char **start, char **end, enum e_token *token, t_envs *e);
 
-// ------------------------------------tokenize_word_in_dollar.c------------------------------------
+// ------------------------------------tokenize_dollar_in_word.c------------------------------------
 char	*key_to_value(char **start, char *end, t_envs *e);
-char	*tokenize_word_in_dollar(char **start, char **end, enum e_token *token, t_envs *e);
-char	*tokenize_word_in_quote_in_dollar(char **start, char **end, enum e_token *token, t_envs *e);
+char	*dollar_in_word(char **start, char **end, enum e_token *t, t_envs *e);
+char	*dollar_in_quote(char **start, char **end, enum e_token *t, t_envs *e);
 
 // -----------------------------------tokenize_redirect.c-------------------------------------------
 void	get_redirect_token(char **start, char **end, enum e_token *token);
-t_token	*tokenize_redirect(char **start, char **end, enum e_token *token, t_envs *e);
+t_token	*tokenize_redirect(char **start, char **end, enum e_token *t, t_envs *e);
 
 // -----------------------------------tokenize_one_elem.c-------------------------------------------
 t_token	*tokenize_pipe(char **end, enum e_token *token);
@@ -179,11 +180,11 @@ void	print_type_str(enum e_type type);
 void	print_token_list(t_token *t);
 
 // -----------------------------------token_utils.c-------------------------------------------------
-void free_token(t_token *t);
-char *ft_strjoin(char *s1, char *s2);
-char *ft_strnjoin(char *s1, char *s2, int len);
-char *ft_strchr(char *s, char c);
-t_token *create_new_token(void);
+void	free_token(t_token *t);
+char	*ft_strjoin(char *s1, char *s2);
+char	*ft_strnjoin(char *s1, char *s2, int len);
+char	*ft_strchr(char *s, char c);
+t_token	*create_new_token(void);
 
 
 // in parsing

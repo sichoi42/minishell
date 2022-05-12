@@ -6,13 +6,14 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 22:12:39 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/11 22:13:10 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/12 18:02:19 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 #include <stdio.h>
 
+// token 정보를 문자열로 출력.
 void	print_token_str(enum e_token token)
 {
 	if (token & T_WORD)
@@ -34,6 +35,7 @@ void	print_token_str(enum e_token token)
 	printf("\n");
 }
 
+// token type을 문자열로 출력.
 void	print_type_str(enum e_type type)
 {
 	if (type & ARGS)
@@ -47,6 +49,7 @@ void	print_type_str(enum e_type type)
 	printf("\n");
 }
 
+// token Linked list에서 하나씩 token 정보를 출력.
 void	print_token_list(t_token *t)
 {
 	t_token	*p;
