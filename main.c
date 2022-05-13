@@ -97,7 +97,7 @@ int main(int argc, char **argv, char **envp)
 	signal(SIGQUIT, SIG_IGN);
 	while (true)
 	{
-		line = readline("minishell> ");
+		line = readline("minishell$ ");
 		if (line)
 		{
 			init_token_header(&token_header);
