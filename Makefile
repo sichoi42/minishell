@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/15 15:19:16 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/15 17:13:32 by sichoi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,6 @@ LIB_INC = $(shell brew --prefix readline)/include/
 GREEN = \033[0;32m
 RED = \033[0;31m
 RESET = \033[0m
-EOC = \033[0;0m
 CHECK = \033[0;32m\xE2\x9C\x94\033[0m
 
 FUNC = ./tokenize/print_token_info\
@@ -47,7 +46,7 @@ SRC = $(addsuffix .c, $(FUNC))
 OBJ = $(addsuffix .o, $(FUNC))
 
 %.o : %.c
-	@echo "$(NAME)$$ $(GREEN) compiling C file... $(CHECK) $(RESET)"
+	@echo "$(NAME)$$ $(GREEN) compiling... $< $(CHECK) $(RESET)"
 	@$(CC) $(CFLAGS) -o $@ -c $< -I $(LIB_INC)
 
 $(NAME) : $(OBJ)

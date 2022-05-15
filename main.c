@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
+/*   Updated: 2022/05/15 17:24:33 by sichoi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -8,6 +20,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <termios.h>
+#include <errno.h>
 
 // 매개변수로 명령어를 입력하여 토큰화된 결과를 출력.
 // ex
@@ -112,9 +125,9 @@ int main(int argc, char **argv, char **envp)
 			{
 				print_token_list(token_header);
 				init_tree(&tree);
-				// parsing(tree, token_header, &e);
+				parsing(tree, token_header, &e);
 				free_token(token_header);
-				// free_tree(tree);
+				free_tree(tree);
 			}
 			add_history(line);
 			free(line);
