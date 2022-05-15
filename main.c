@@ -86,6 +86,7 @@ int main(int argc, char **argv, char **envp)
 	t_token			*token_header; // token 리스트의 헤더.
 	t_ast			*tree;
 	t_envs			e;
+	char			*s;
 
 	if (argc > 1)
 		return (1);
@@ -101,18 +102,19 @@ int main(int argc, char **argv, char **envp)
 		if (line)
 		{
 			init_token_header(&token_header);
-			if (tokenizing(line, token_header, &e) == WRONG_ACTION)
+			s = tokenizing(line, token_header, &e);
+			if (s != NULL)
 			{
-				printf("detected unclosed quote\n");
+				printf("%s\n", s);
 				free_token(token_header);
 			}
 			else
 			{
 				print_token_list(token_header);
 				init_tree(&tree);
-				parsing(tree, token_header, &e);
+				// parsing(tree, token_header, &e);
 				free_token(token_header);
-				free_tree(tree);
+				// free_tree(tree);
 			}
 			add_history(line);
 			free(line);

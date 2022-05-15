@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 22:15:25 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 18:17:44 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/15 14:52:31 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,9 +96,6 @@ char	*ft_strnjoin(char *s1, char *s2, int len)
 
 char	*ft_strchr(char *s, char c)
 {
-	int	i;
-
-	i = 0;
 	while (*s)
 	{
 		if (*s == c)

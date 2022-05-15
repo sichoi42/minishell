@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 19:05:26 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/15 15:15:48 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 # define ARG_NUM_ERROR "too many arguments"
 # define NUMERIC_ERROR "numeric argument required"
 # define NOT_VALID_ERROR "not a valid identifier"
+# define SYNTAX_ERROR "syntax error"
+# define UNCLOSED_Q "detected unclosed quote"
 
 # define OVER_LONG_NUM 9223372036854775808UL
 
@@ -154,7 +156,7 @@ int	g_exit_code;
 // ------------------------------------tokenize.c---------------------------------------------------
 void	moving_two_pointers(char **start, char **end);
 t_token	*token_split(char **start, char **end, enum e_token *token, t_envs *e);
-int		tokenizing(char *line, t_token *t, t_envs *e);
+char	*tokenizing(char *line, t_token *t, t_envs *e);
 
 // ------------------------------------tokenize_word.c----------------------------------------------
 void	join_normal_word(char **s, char **start, char **end);
@@ -220,7 +222,7 @@ int		ft_strlen(char *s);
 char	*ft_strndup(char *src, int len);
 char	*ft_strdup(char *src);
 int		is_space(char c);
-
+int		ft_strncmp(char *s1, char *s2, unsigned int n);
 
 
 // swi

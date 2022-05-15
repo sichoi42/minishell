@@ -61,3 +61,22 @@ int	is_space(char c)
 		return (1);
 	return (0);
 }
+
+int	ft_strncmp(char *s1, char *s2, unsigned int n)
+{
+	unsigned int	i;
+	unsigned char	*str1;
+	unsigned char	*str2;
+
+	str1 = (unsigned char *)s1;
+	str2 = (unsigned char *)s2;
+	if (n == 0)
+		return (0);
+	i = 0;
+	while (str1[i] == str2[i] && str1[i] && str2[i] && i < n)
+		i++;
+	if (i == n)
+		return ((int)str1[i - 1] - (int)str2[i - 1]);
+	else
+		return ((int)str1[i] - (int)str2[i]);
+}

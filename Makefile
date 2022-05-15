@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/13 17:14:19 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/15 15:19:16 by sichoi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,17 +43,15 @@ FUNC = ./tokenize/print_token_info\
 		redirect\
 		utils\
 
-INC = minishell.h
-
 SRC = $(addsuffix .c, $(FUNC))
 OBJ = $(addsuffix .o, $(FUNC))
 
 %.o : %.c
 	@echo "$(NAME)$$ $(GREEN) compiling C file... $(CHECK) $(RESET)"
-	@$(CC) $(CFLAGS) -I $(INC) -o $@ -c $< -I $(LIB_INC)
+	@$(CC) $(CFLAGS) -o $@ -c $< -I $(LIB_INC)
 
 $(NAME) : $(OBJ)
-	@$(CC) $(CFLAGS) -I $(INC) -o $(NAME) $(OBJ) -l $(LIB_NAME) -I $(LIB_INC) -L $(LIB_DIR)
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -l $(LIB_NAME) -I $(LIB_INC) -L $(LIB_DIR)
 	@echo "$(NAME)$$ $(GREEN) $(NAME) was created! $(RESET)"
 
 all : $(NAME)

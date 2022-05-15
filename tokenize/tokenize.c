@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 20:55:11 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 18:02:26 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/15 15:15:04 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ t_token	*token_split(char **start, char **end, enum e_token *token, t_envs *e)
 }
 
 // 받아온 line에서 토큰을 하나씩 받아서 linked list에 연결.
-int	tokenizing(char *line, t_token *t, t_envs *e)
+char	*tokenizing(char *line, t_token *t, t_envs *e)
 {
 	char			*start;
 	char			*end;
@@ -57,10 +57,13 @@ int	tokenizing(char *line, t_token *t, t_envs *e)
 		{
 			new = token_split(&start, &end, &token, e);
 			if (new == NULL)
-				return (WRONG_ACTION);
+				return (UNCLOSED_Q);
+			if (new->type & REDIRECT)
+				if (new->type & PIPE || new->type & STAR || !ft_strncmp(new->s, "", 1))
+					return (SYNTAX_ERROR);
 			p->next = new;
 			p = p->next;
 		}
 	}
-	return (OK);
+	return (NULL);
 }
