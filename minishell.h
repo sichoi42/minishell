@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/15 15:15:48 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/16 23:39:08 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,10 @@ char	*ft_strndup(char *src, int len);
 char	*ft_strdup(char *src);
 int		is_space(char c);
 int		ft_strncmp(char *s1, char *s2, unsigned int n);
+
+// main.c
+void	turn_off_echoctl(void);
+void	turn_on_echoctl(void);
 
 
 // swi

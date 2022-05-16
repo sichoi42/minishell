@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/15 17:29:56 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/16 23:47:07 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,21 @@ void	handler(int signum)
 	}
 }
 
-void	init_term(void)
+void	turn_off_echoctl(void)
 {
 	struct termios	term;
 
 	tcgetattr(STDIN_FILENO, &term);
 	term.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
+void	turn_on_echoctl(void)
+{
+	struct termios	term;
+
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag |= ECHOCTL;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
@@ -105,7 +114,7 @@ int main(int argc, char **argv, char **envp)
 		return (1);
 	(void)argv;
 	(void)envp;
-	init_term();
+	turn_off_echoctl();
 	input_env(&e, envp);
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);
@@ -123,7 +132,7 @@ int main(int argc, char **argv, char **envp)
 			}
 			else
 			{
-				print_token_list(token_header);
+				// print_token_list(token_header);
 				init_tree(&tree);
 				parsing(tree, token_header, &e);
 				free_token(token_header);
