@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 18:04:41 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 18:15:30 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ void exe_command(t_ast *node, t_envs *e)
 	t = node->token;
 	while (t)
 	{
-		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(node->token->s) + 1);
-		ft_strcpy(node->token->s, o.opers[i]);
+		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(t->s) + 1);
+		ft_strcpy(t->s, o.opers[i]);
 		t = t->next;
 	}
 	// builtin 후에 path를 찾는 방식으로 로직수정 필요.
