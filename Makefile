@@ -6,13 +6,13 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/15 17:13:32 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/17 15:23:36 by swi              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 LIB_NAME = readline
 LIB_DIR = $(shell brew --prefix readline)/lib/
 LIB_INC = $(shell brew --prefix readline)/include/
