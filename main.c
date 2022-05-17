@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 16:24:23 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/17 16:42:58 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,6 @@ static void wait_child(void)
 	while (waitpid(-1, &status, 0) >= 0)
 		++i;
 	g_exit_code = status / 256;
-	printf("@exit_code:%d\n", g_exit_code);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -128,14 +127,13 @@ int main(int argc, char **argv, char **envp)
 		return (1);
 	(void)argv;
 	(void)envp;
-	turn_off_echoctl();
 	input_env(&e, envp);
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);
 	while (true)
 	{
+		turn_off_echoctl();
 		line = readline("minishell$ ");
-		printf("@3%s\n", line);
 		if (line)
 		{
 			init_token_header(&token_header);
@@ -152,7 +150,6 @@ int main(int argc, char **argv, char **envp)
 				parsing(tree, token_header);
 				turn_on_echoctl();
 				tree_searching(tree, &e);
-				turn_off_echoctl();
 				dup_check(tree->root->std_fd[0], STDIN_FILENO);
 				dup_check(tree->root->std_fd[1], STDOUT_FILENO);
 				close(tree->root->std_fd[0]);
@@ -163,11 +160,9 @@ int main(int argc, char **argv, char **envp)
 			add_history(line);
 			free(line);
 			line = NULL;
-		printf("@2\n");
 		}
 		else
 		{
-		printf("@4\n");
 			free_envs(&e);
 			printf("\033[1A");
 			printf("\033[11C");
@@ -175,7 +170,6 @@ int main(int argc, char **argv, char **envp)
 			return (1);
 		}
 		wait_child();
-		printf("@1\n");
 	}
 	return (0);
 }

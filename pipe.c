@@ -202,7 +202,6 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 {
 	int pid;
 
-	printf("@exe_oper_1\n"); fflush(0);
 	pid = fork();
 	if (pid == 0)
 	{
@@ -220,14 +219,11 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 	}
 	else if (pid == -1)
 		exit(1);
-	printf("@exe_oper_2\n"); fflush(0);
 	if (node->root->pipe_cnt > 0)
 		dup_check(node->root->pipe_fd[0], STDIN_FILENO);
 	else if (node->root->pipe_cnt == 0)
 		close(STDIN_FILENO);
-	printf("@exe_oper_3\n"); fflush(0);
 	if (node->root->pipe_cnt > 0)
 		close_pipe(node->root->pipe_fd);
-	printf("@exe_oper_4\n"); fflush(0);
 	node->root->pipe_cnt -= 1;
 }
