@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -201,15 +202,14 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 {
 	int pid;
 
+	printf("@exe_oper_1\n"); fflush(0);
 	pid = fork();
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
 	if (pid == 0)
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
-		if (node->pipe_cnt > 0)
-			close_pipe(node->pipe_fd);
+		if (node->root->pipe_cnt > 0)
+			close_pipe(node->root->pipe_fd);
 		if (built_in_check(o, e) == -1)
 		{
 			execve(o->oper_path, o->opers, e->env);
@@ -220,11 +220,14 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 	}
 	else if (pid == -1)
 		exit(1);
-	if (node->pipe_cnt > 0)
-		dup_check(node->pipe_fd[0], STDIN_FILENO);
-	else if (node->pipe_cnt == 0)
+	printf("@exe_oper_2\n"); fflush(0);
+	if (node->root->pipe_cnt > 0)
+		dup_check(node->root->pipe_fd[0], STDIN_FILENO);
+	else if (node->root->pipe_cnt == 0)
 		close(STDIN_FILENO);
-	if (node->pipe_cnt > 0)
-		close_pipe(node->pipe_fd);
-	node->pipe_cnt -= 1;
+	printf("@exe_oper_3\n"); fflush(0);
+	if (node->root->pipe_cnt > 0)
+		close_pipe(node->root->pipe_fd);
+	printf("@exe_oper_4\n"); fflush(0);
+	node->root->pipe_cnt -= 1;
 }

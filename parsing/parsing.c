@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 15:20:22 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/17 16:29:25 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,22 +33,26 @@ void exe_command(t_ast *node, t_envs *e)
 	t_paths p;
 	int i;
 
-	o.opers = malloc_array(sizeof(char *), node->root->argc + 1);
-	o.opers[node->root->argc] = NULL;
+	o.opers = malloc_array(sizeof(char *), node->argc + 1);
+	printf("@argc:%d\n", node->argc);
+	o.opers[node->argc] = NULL;
 	i = -1;
 	while (node->token)
 	{
 		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(node->token->s) + 1);
 		ft_strcpy(node->token->s, o.opers[i]);
+		printf("@%s\n", o.opers[i]);
 		node->token = node->token->next;
 	}
 	// builtin 후에 path를 찾는 방식으로 로직수정 필요.
 	find_path(&(p.paths), &(p.max_len), e);
 	o.oper_path = make_oper(o.opers, p.max_len, p.paths);
+	printf("@exe_command_1\n"); fflush(0);
 	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e) == -1)
 		exe_oper(&o, node, e);
 	else if (node->root->pipe_cnt >= 0)
 		exe_oper(&o, node, e);
+	printf("@exe_command_2\n"); fflush(0);
 	free(o.oper_path);
 	free_double_char(o.opers);
 	free_double_char(p.paths);
@@ -61,10 +65,13 @@ void execute_something(t_ast *node, t_envs *e)
 	printf("tree_type: %s\n", get_tree_type_str(node->tree_type));
 	if (node->tree_type == TREE_BUNDLE)
 	{
-		init_pipe(node->pipe_fd);
-		dup_check(node->std_fd[1], STDOUT_FILENO);
+		printf("@execute_something_1\n"); fflush(0);
+		init_pipe(node->root->pipe_fd);
+		printf("@execute_something_2, %d, %d\n", node->root->std_fd[1], STDOUT_FILENO); fflush(0);
+		dup_check(node->root->std_fd[1], STDOUT_FILENO);
+		printf("@execute_something_3\n"); fflush(0);
 		if (node->root->pipe_cnt > 0)
-			make_pipe(node->pipe_fd);
+			make_pipe(node->root->pipe_fd);
 	}
 	if (node->token != NULL)
 	{
@@ -79,7 +86,7 @@ void execute_something(t_ast *node, t_envs *e)
 				t = t->next;
 			}
 			printf("\n");
-			printf("argc: %d\n", node->root->argc);
+			printf("argc: %d\n", node->argc);
 			printf("pipe: %d\n", node->root->pipe_cnt);
 			printf("pwd: %s\n", e->pwd);
 		}
