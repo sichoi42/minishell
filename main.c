@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/16 23:47:07 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 14:16:33 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,10 @@ int main(int argc, char **argv, char **envp)
 			{
 				// print_token_list(token_header);
 				init_tree(&tree);
-				parsing(tree, token_header, &e);
+				parsing(tree, token_header);
+				turn_on_echoctl();
+				tree_searching(tree, &e);
+				turn_off_echoctl();
 				free_token(token_header);
 				free_tree(tree);
 			}

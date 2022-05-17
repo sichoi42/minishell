@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/16 23:47:20 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 14:15:56 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void	parsing(t_ast *tree, t_token *token_header, t_envs *e)
+void	parsing(t_ast *tree, t_token *token_header)
 {
 	t_token	*p;
 
@@ -24,15 +24,13 @@ void	parsing(t_ast *tree, t_token *token_header, t_envs *e)
 		syntax_pipe(tree, p, tree->root);
 		p = p->next;
 	}
-	turn_on_echoctl();
-	tree_searching(tree, e);
-	turn_off_echoctl();
 }
 
 void	execute_something(t_ast *node, t_envs *e)
 {
 	t_token	*t;
 
+	(void)e;
 	printf("%s\n", get_tree_type_str(node->tree_type));
 	if (node->token != NULL)
 	{

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/16 23:39:08 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 14:16:19 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,7 @@ t_token	*create_new_token(void);
 // ==================================In parsing directory===========================================
 
 // ------------------------------------parsing.c----------------------------------------------------
-void	parsing(t_ast *tree, t_token *token_header, t_envs *e);
+void	parsing(t_ast *tree, t_token *token_header);
 void	execute_something(t_ast *node, t_envs *e);
 void	tree_searching(t_ast *node, t_envs *e);
 
@@ -227,6 +227,7 @@ int		ft_strncmp(char *s1, char *s2, unsigned int n);
 // main.c
 void	turn_off_echoctl(void);
 void	turn_on_echoctl(void);
+void	handler(int signum);
 
 
 // swi
