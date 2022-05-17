@@ -157,6 +157,8 @@ int	ft_export(t_oper *o, t_envs *e)
 
 	rtn = OK;
 	i = 0;
+	key = NULL;
+	value = NULL;
 	while (o->opers[++i] != NULL)
 	{
 		make_key_value(o->opers[i], &key, &value);
