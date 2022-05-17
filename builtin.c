@@ -157,6 +157,8 @@ int	ft_export(t_oper *o, t_envs *e)
 
 	rtn = OK;
 	i = 0;
+	key = NULL;
+	value = NULL;
 	while (o->opers[++i] != NULL)
 	{
 		make_key_value(o->opers[i], &key, &value);
@@ -167,6 +169,7 @@ int	ft_export(t_oper *o, t_envs *e)
 	}
 	if (i == 1)
 		print_export(e);
+	// printf("@@"); fflush(0);
 	free(key);
 	free(value);
 	return (rtn);

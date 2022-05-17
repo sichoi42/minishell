@@ -131,6 +131,12 @@ void	init_pipe(int *pipe_fd)
 	pipe_fd[1] = -1;
 }
 
+void	close_pipe(int *pipe_fd)
+{
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+}
+
 int	make_pipe(int *p_fd)
 {
 	int	rtn;

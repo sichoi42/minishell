@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 14:16:33 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 18:05:15 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,19 @@ void	init_tree(t_ast **tree)
 	(*tree)->tree_type = TREE_PIPE;
 	(*tree)->pipe_cnt = -1;
 	(*tree)->root = *tree;
+	(*tree)->std_fd[0] = dup(STDIN_FILENO);
+	(*tree)->std_fd[1] = dup(STDOUT_FILENO);
+}
+
+static void wait_child(void)
+{
+	int	i;
+	int	status;
+
+	i = 0;
+	while (waitpid(-1, &status, 0) >= 0)
+		++i;
+	g_exit_code = status / 256;
 }
 
 int main(int argc, char **argv, char **envp)
@@ -114,12 +127,12 @@ int main(int argc, char **argv, char **envp)
 		return (1);
 	(void)argv;
 	(void)envp;
-	turn_off_echoctl();
 	input_env(&e, envp);
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);
 	while (true)
 	{
+		turn_off_echoctl();
 		line = readline("minishell$ ");
 		if (line)
 		{
@@ -137,7 +150,10 @@ int main(int argc, char **argv, char **envp)
 				parsing(tree, token_header);
 				turn_on_echoctl();
 				tree_searching(tree, &e);
-				turn_off_echoctl();
+				dup_check(tree->root->std_fd[0], STDIN_FILENO);
+				dup_check(tree->root->std_fd[1], STDOUT_FILENO);
+				close(tree->root->std_fd[0]);
+				close(tree->root->std_fd[1]);
 				free_token(token_header);
 				free_tree(tree);
 			}
@@ -153,6 +169,7 @@ int main(int argc, char **argv, char **envp)
 			printf("exit\n");
 			return (1);
 		}
+		wait_child();
 	}
 	return (0);
 }

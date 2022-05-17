@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -103,12 +104,13 @@ char	*make_oper_path(char *oper_path, char *path, char *oper)
 	return (oper_path);
 }
 
-void	find_path(char ***paths, int *max_path)
+void	find_path(char ***paths, int *max_path, t_envs *e)
 {
 	char	*path;
 	int		count;
 
-	path = getenv("PATH");
+	//path = getenv("PATH");
+	path = get_env_value(e, "PATH");
 	count = 0;
 	count_words_alloc(paths, path, ":", &count);
 	count_word_alloc(path, *paths, ":", max_path);
@@ -144,18 +146,14 @@ static int	check_right_path(char **o_path, char **paths, char *oper)
 	return (exit_code);
 }
 
-char	*make_oper(char ***opers, int max_path, char **paths, char *argv)
+char	*make_oper(char **opers, int max_path, char **paths)
 {
 	char		*oper_path;
 	int			max_oper;
-	int			count;
 
-	count = 0;
-	count_words_alloc(opers, argv, " \t", &count);
-	count_word_alloc(argv, *opers, " \t", &max_oper);
-	fill_array(argv, *opers, " \t", count);
-	oper_path = malloc_array(sizeof(char), max_path + max_oper);
-	if (check_right_path(&oper_path, paths, (*opers)[0]) != OK)
+	max_oper = ft_strlen(opers[0]);
+	oper_path = malloc_array(sizeof(char), max_path + max_oper + 1);
+	if (check_right_path(&oper_path, paths, opers[0]) != OK)
 	{
 		free(oper_path);
 		oper_path = NULL;
@@ -163,6 +161,7 @@ char	*make_oper(char ***opers, int max_path, char **paths, char *argv)
 	return (oper_path);
 }
 
+/*
 void	exe_oper(t_oper *o, int *pipe_fd, char *envp[])
 {
 	int	pid;
@@ -196,4 +195,35 @@ void	exe_oper(t_oper *o, int *pipe_fd, char *envp[])
 	close(pipe_fd[1]);
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);
+}
+*/
+
+void exe_oper(t_oper *o, t_ast *node, t_envs *e)
+{
+	int pid;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		if (node->root->pipe_cnt > 0)
+			close_pipe(node->root->pipe_fd);
+		if (built_in_check(o, e) == -1)
+		{
+			execve(o->oper_path, o->opers, e->env);
+			print_error("bash", o->opers[0], strerror(errno), NULL);
+			exit(1);
+		}
+		exit(0);
+	}
+	else if (pid == -1)
+		exit(1);
+	if (node->root->pipe_cnt > 0)
+		dup_check(node->root->pipe_fd[0], STDIN_FILENO);
+	else if (node->root->pipe_cnt == 0)
+		close(STDIN_FILENO);
+	if (node->root->pipe_cnt > 0)
+		close_pipe(node->root->pipe_fd);
+	node->root->pipe_cnt -= 1;
 }

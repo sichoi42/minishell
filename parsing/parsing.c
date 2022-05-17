@@ -6,13 +6,14 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 14:15:56 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 18:15:30 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 void	parsing(t_ast *tree, t_token *token_header)
 {
@@ -26,6 +27,62 @@ void	parsing(t_ast *tree, t_token *token_header)
 	}
 }
 
+void exe_command(t_ast *node, t_envs *e)
+{
+	t_oper o;
+	t_paths p;
+	t_token	*t;
+	int i;
+
+	o.opers = malloc_array(sizeof(char *), node->argc + 1);
+	o.opers[node->argc] = NULL;
+	i = -1;
+	t = node->token;
+	while (t)
+	{
+		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(t->s) + 1);
+		ft_strcpy(t->s, o.opers[i]);
+		t = t->next;
+	}
+	// builtin 후에 path를 찾는 방식으로 로직수정 필요.
+	find_path(&(p.paths), &(p.max_len), e);
+	o.oper_path = make_oper(o.opers, p.max_len, p.paths);
+	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e) == -1)
+		exe_oper(&o, node, e);
+	else if (node->root->pipe_cnt >= 0)
+		exe_oper(&o, node, e);
+	free(o.oper_path);
+	free_double_char(o.opers);
+	free_double_char(p.paths);
+}
+
+void execute_something(t_ast *node, t_envs *e)
+{
+	t_token *t;
+
+	if (node->tree_type == TREE_BUNDLE)
+	{
+		init_pipe(node->root->pipe_fd);
+		dup_check(node->root->std_fd[1], STDOUT_FILENO);
+		if (node->root->pipe_cnt > 0)
+			make_pipe(node->root->pipe_fd);
+	}
+	if (node->token != NULL)
+	{
+		t = node->token;
+		if (node->tree_type == TREE_CMD)
+		{
+			exe_command(node, e);
+		}
+		else
+		{
+			if (t->type == REDIRECT)
+				red_open_file(t->token, t->s);
+		}
+	}
+}
+
+/*
 void	execute_something(t_ast *node, t_envs *e)
 {
 	t_token	*t;
@@ -47,7 +104,6 @@ void	execute_something(t_ast *node, t_envs *e)
 			printf("\n");
 			printf("argc: %d\n", node->argc);
 			printf("pipe: %d\n", node->root->pipe_cnt);
-			printf("pwd: %s\n", e->pwd);
 		}
 		else
 		{
@@ -59,6 +115,7 @@ void	execute_something(t_ast *node, t_envs *e)
 	}
 	printf("------------------\n");
 }
+*/
 
 // preorder로 트리를 탐색.
 void	tree_searching(t_ast *node, t_envs *e)

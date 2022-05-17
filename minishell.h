@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 14:16:19 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 16:01:57 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ typedef struct s_ast
 	enum e_tree_type	tree_type; // 트리의 타입
 	int					pipe_cnt; // 파이프 개수
 	int					argc;
+	int					pipe_fd[2];
+	int					std_fd[2];
 }	t_ast;
 
 typedef	struct s_command
@@ -276,6 +278,7 @@ int					delete_env(t_envs *e, char *key);
 int					dup_check(int fd_l, int fd_r);
 int					red_open_file(enum e_token t, char *f_name);
 void				init_pipe(int *pipe_fd);
+void				close_pipe(int *pipe_fd);
 int					make_pipe(int *p_fd);
 
 // pipe.c
@@ -283,9 +286,12 @@ void				count_words_alloc(char ***paths, char *org, char div[], int *count);
 void				count_word_alloc(char *org, char **words, char *div, int *max_len);
 void				fill_array(char *org, char **words, char *div, int count);
 char				*make_oper_path(char *oper_path, char *path, char *oper);
-void				find_path(char ***paths, int *max_path);
-char				*make_oper(char ***opers, int max_path, char **paths, char *argv);
-void				exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
+//void				find_path(char ***paths, int *max_path);
+//char				*make_oper(char ***opers, int max_path, char **paths, char *argv);
+//void				exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
+void				find_path(char ***paths, int *max_path, t_envs *e);
+char				*make_oper(char **opers, int max_path, char **paths);
+void				exe_oper(t_oper *o, t_ast *node, t_envs *e);
 // ==================================================================
 
 
