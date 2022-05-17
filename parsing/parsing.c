@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 16:56:19 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 18:04:41 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,16 +31,18 @@ void exe_command(t_ast *node, t_envs *e)
 {
 	t_oper o;
 	t_paths p;
+	t_token	*t;
 	int i;
 
 	o.opers = malloc_array(sizeof(char *), node->argc + 1);
 	o.opers[node->argc] = NULL;
 	i = -1;
-	while (node->token)
+	t = node->token;
+	while (t)
 	{
 		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(node->token->s) + 1);
 		ft_strcpy(node->token->s, o.opers[i]);
-		node->token = node->token->next;
+		t = t->next;
 	}
 	// builtin 후에 path를 찾는 방식으로 로직수정 필요.
 	find_path(&(p.paths), &(p.max_len), e);

@@ -169,6 +169,7 @@ int	ft_export(t_oper *o, t_envs *e)
 	}
 	if (i == 1)
 		print_export(e);
+	// printf("@@"); fflush(0);
 	free(key);
 	free(value);
 	return (rtn);

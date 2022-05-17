@@ -21,13 +21,13 @@ void	free_envs(t_envs *e)
 
 void	free_double_char(char **dptr)
 {
-	char **temp;
+	int	i;
 
-	temp = dptr;
-	while (*temp != NULL)
+	i = 0;
+	while (dptr[i])
 	{
-		free(*temp);
-		temp += 1;
+		free(dptr[i]);
+		++i;
 	}
 	free(dptr);
 }
