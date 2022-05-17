@@ -34,6 +34,7 @@ static int	red_here_doc(int *fd, char *limit)
 		if (ft_strcmp(str, limit) == 0)
 			break ;
 		write(*fd, str, ft_strlen(str));
+		write(*fd, "\n", 1);
 	}
 	close(*fd);
 	*fd = open(TEMP_FILE, O_RDWR);
@@ -106,13 +107,13 @@ int	red_open_file(enum e_token t, char *f_name)
 {
 	int	fd;
 
-	if (t == T_RE_INPUT)
+	if (t & T_RE_INPUT)
 		return (red_in(f_name));
-	else if (t == T_RE_APPEND_OUTPUT)
+	else if (t & T_RE_APPEND_OUTPUT)
 		return (red_append(f_name));
-	else if (t == T_RE_OUTPUT)
+	else if (t & T_RE_OUTPUT)
 		return (red_out(f_name));
-	else if (t == T_RE_HEREDOC)
+	else if (t & T_RE_HEREDOC)
 	{
 		fd = open(TEMP_FILE, O_RDWR | O_CREAT | O_TRUNC, 0664);
 		if (fd == -1)
