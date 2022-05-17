@@ -31,7 +31,7 @@ static int	red_here_doc(int *fd, char *limit)
 	{
 		rl_replace_line("", 1);
 		str = readline("> ");
-		if (ft_strcmp(str, limit) == 0)
+		if (!str || ft_strcmp(str, limit) == 0)
 			break ;
 		write(*fd, str, ft_strlen(str));
 		write(*fd, "\n", 1);

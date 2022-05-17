@@ -205,8 +205,8 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 	pid = fork();
 	if (pid == 0)
 	{
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
+		// signal(SIGINT, SIG_IGN);
+		// signal(SIGQUIT, SIG_IGN);
 		if (node->root->pipe_cnt > 0)
 			close_pipe(node->root->pipe_fd);
 		if (built_in_check(o, e) == -1)

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 18:05:15 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 01:10:29 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,13 +106,11 @@ void	init_tree(t_ast **tree)
 
 static void wait_child(void)
 {
-	int	i;
 	int	status;
 
-	i = 0;
 	while (waitpid(-1, &status, 0) >= 0)
-		++i;
-	g_exit_code = status / 256;
+		;
+	g_exit_code = status >> 8;
 }
 
 int main(int argc, char **argv, char **envp)
@@ -133,6 +131,9 @@ int main(int argc, char **argv, char **envp)
 	while (true)
 	{
 		turn_off_echoctl();
+		// printf("\033[6n");
+		// TODO: 이 시점의 커서 위치를 파일에다가 저장 후,
+		// eof를 만났을 때 그 시점의 커서 위치의 col값 + 11만큼으로 커서 이동.
 		line = readline("minishell$ ");
 		if (line)
 		{
@@ -148,7 +149,6 @@ int main(int argc, char **argv, char **envp)
 				// print_token_list(token_header);
 				init_tree(&tree);
 				parsing(tree, token_header);
-				turn_on_echoctl();
 				tree_searching(tree, &e);
 				dup_check(tree->root->std_fd[0], STDIN_FILENO);
 				dup_check(tree->root->std_fd[1], STDOUT_FILENO);
