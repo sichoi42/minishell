@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
+/*   Updated: 2022/05/17 14:16:33 by sichoi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -8,6 +20,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <termios.h>
+#include <errno.h>
 
 // 매개변수로 명령어를 입력하여 토큰화된 결과를 출력.
 // ex
@@ -49,12 +62,21 @@ void	handler(int signum)
 	}
 }
 
-void	init_term(void)
+void	turn_off_echoctl(void)
 {
 	struct termios	term;
 
 	tcgetattr(STDIN_FILENO, &term);
 	term.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
+void	turn_on_echoctl(void)
+{
+	struct termios	term;
+
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag |= ECHOCTL;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
@@ -86,31 +108,36 @@ int main(int argc, char **argv, char **envp)
 	t_token			*token_header; // token 리스트의 헤더.
 	t_ast			*tree;
 	t_envs			e;
+	char			*s;
 
 	if (argc > 1)
 		return (1);
 	(void)argv;
 	(void)envp;
-	init_term();
+	turn_off_echoctl();
 	input_env(&e, envp);
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);
 	while (true)
 	{
-		line = readline("minishell> ");
+		line = readline("minishell$ ");
 		if (line)
 		{
 			init_token_header(&token_header);
-			if (tokenizing(line, token_header, &e) == WRONG_ACTION)
+			s = tokenizing(line, token_header, &e);
+			if (s != NULL)
 			{
-				printf("detected unclosed quote\n");
+				printf("%s\n", s);
 				free_token(token_header);
 			}
 			else
 			{
-				print_token_list(token_header);
+				// print_token_list(token_header);
 				init_tree(&tree);
-				parsing(tree, token_header, &e);
+				parsing(tree, token_header);
+				turn_on_echoctl();
+				tree_searching(tree, &e);
+				turn_off_echoctl();
 				free_token(token_header);
 				free_tree(tree);
 			}

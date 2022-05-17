@@ -168,8 +168,12 @@ void	exe_oper(t_oper *o, int *pipe_fd, char *envp[])
 	int	pid;
 
 	pid = fork();
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	if (pid == 0)
 	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 		// pipe가 있으면
 		//dup_check(pipe_fd[1], STDOUT_FILENO);
 		close(pipe_fd[0]);
@@ -190,4 +194,6 @@ void	exe_oper(t_oper *o, int *pipe_fd, char *envp[])
 	//close(STDIN_FILENO);
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
+	signal(SIGINT, handler);
+	signal(SIGQUIT, SIG_IGN);
 }

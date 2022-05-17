@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/15 16:15:59 by sichoi            #+#    #+#             */
+/*   Updated: 2022/05/15 16:16:00 by sichoi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include <stdlib.h>
 
@@ -17,23 +29,17 @@ char	*ft_strdup(char *src)
 {
 	char	*dst;
 	int		i;
-	int		j;
 
 	dst = malloc(ft_strlen(src) + 1);
 	if (dst == NULL)
 		return (NULL);
 	i = 0;
-	j = 0;
 	if (src)
 	{
-		while (src[j])
+		while (src[i])
 		{
-			if (src[j] != '\\' || (j > 0 && src[j - 1] == '\\' && src[j] == '\\'))
-			{
-				dst[i] = src[j];
-				++i;
-			}
-			++j;
+			dst[i] = src[i];
+			++i;
 		}
 	}
 	dst[i] = 0;
@@ -44,25 +50,18 @@ char	*ft_strndup(char *src, int len)
 {
 	char	*dst;
 	int		i;
-	int		j;
-	int		n;
 
-	n = ft_strlen(src);
-	if (n < len)
-		len = n;
 	dst = malloc(len + 1);
 	if (dst == NULL)
 		return (NULL);
 	i = 0;
-	j = 0;
-	while (src[j] && j < len)
+	if (src)
 	{
-		if (src[j] != '\\' || (j > 0 && src[j - 1] == '\\' && src[j] == '\\'))
+		while (src[i] && i < len)
 		{
-			dst[i] = src[j];
+			dst[i] = src[i];
 			++i;
 		}
-		++j;
 	}
 	dst[i] = 0;
 	return (dst);
@@ -75,11 +74,21 @@ int	is_space(char c)
 	return (0);
 }
 
-// char	*ft_strchr(char *s, int c)
-// {
-// 	while (*s && *s != (char)c)
-// 		++s;
-// 	if (*s == (char)c)
-// 		return ((char *)s);
-// 	return (NULL);
-// }
+int	ft_strncmp(char *s1, char *s2, unsigned int n)
+{
+	unsigned int	i;
+	unsigned char	*str1;
+	unsigned char	*str2;
+
+	str1 = (unsigned char *)s1;
+	str2 = (unsigned char *)s2;
+	if (n == 0)
+		return (0);
+	i = 0;
+	while (str1[i] == str2[i] && str1[i] && str2[i] && i < n)
+		i++;
+	if (i == n)
+		return ((int)str1[i - 1] - (int)str2[i - 1]);
+	else
+		return ((int)str1[i] - (int)str2[i]);
+}
