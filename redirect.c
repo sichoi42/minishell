@@ -23,28 +23,18 @@ int	dup_check(int fd_l, int fd_r)
 	return (OK);
 }
 
-static int	red_here_doc(int *fd, char *limit)
+static int	red_here_doc(char *file_name)
 {
-	char	*str;
+	int	fd;
 
-	while (1)
+	fd = open(file_name, O_RDWR);
+	if (fd == -1)
 	{
-		rl_replace_line("", 1);
-		str = readline("> ");
-		if (!str || ft_strcmp(str, limit) == 0)
-			break ;
-		write(*fd, str, ft_strlen(str));
-		write(*fd, "\n", 1);
-	}
-	close(*fd);
-	*fd = open(TEMP_FILE, O_RDWR);
-	if (*fd == -1)
-	{
-		print_error("bash", TEMP_FILE, strerror(errno), NULL);
+		print_error("bash", file_name, strerror(errno), NULL);
 		return (WRONG_ACTION);
 	}
-	unlink(TEMP_FILE);
-	return (dup_check(*fd, STDIN_FILENO));
+	unlink(file_name);
+	return (dup_check(fd, STDIN_FILENO));
 }
 
 static int	red_in(char *f_name)
@@ -103,26 +93,16 @@ static int	red_append(char *f_name)
  * here_doc의 경우 f_name에 ".이름" 방식으로 이름 넣기.
  */
 // 리다이렉션 오픈하는 함수 + heredoc 실행까지
-int	red_open_file(enum e_token t, char *f_name)
+int	red_open_file(t_token *t, char *f_name)
 {
-	int	fd;
-
-	if (t & T_RE_INPUT)
+	if (t->token & T_RE_INPUT)
 		return (red_in(f_name));
-	else if (t & T_RE_APPEND_OUTPUT)
+	else if (t->token & T_RE_APPEND_OUTPUT)
 		return (red_append(f_name));
-	else if (t & T_RE_OUTPUT)
+	else if (t->token & T_RE_OUTPUT)
 		return (red_out(f_name));
-	else if (t & T_RE_HEREDOC)
-	{
-		fd = open(TEMP_FILE, O_RDWR | O_CREAT | O_TRUNC, 0664);
-		if (fd == -1)
-		{
-			print_error("bash", TEMP_FILE, strerror(errno), NULL);
-			return (WRONG_ACTION);
-		}
-		return (red_here_doc(&fd, f_name));
-	}
+	else if (t->token & T_RE_HEREDOC)
+		return (red_here_doc(t->file_name));
 	return (WRONG_ACTION);
 }
 

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 19:03:00 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 19:08:50 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 17:10:23 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,14 +80,6 @@ void	syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root)
 {
 	(void)root;
 	node->token = ft_token_dup(t);
-	if (t->token & T_RE_OUTPUT)
-		;
-	else if (t->token & T_RE_INPUT)
-		;
-	else if (t->token & T_RE_APPEND_OUTPUT)
-		;
-	else if (t->token & T_RE_HEREDOC)
-		;
 }
 
 int	syntax_cmd(t_ast *node, t_token *t, t_ast *root)

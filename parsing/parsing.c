@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 15:21:41 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 18:31:00 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,67 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+// void	handler_here_doc(int signum)
+// {
+
+// }
+
+char	*heredoc_input(char *limit)
+{
+	char		*str;
+	char		*s;
+	char		*file_name;
+	int			fd;
+	static int	cnt;
+
+	s = ft_itoa(cnt);
+	if (s == 0)
+		exit(1);
+	file_name = ft_strjoin(ft_strdup(TEMP_FILE), s);
+	fd = open(file_name, O_RDWR | O_CREAT | O_TRUNC, 0664);
+	if (fd == -1)
+	{
+		print_error("bash", file_name, strerror(errno), NULL);
+		// return (WRONG_ACTION);
+	}
+	// signal(SIGINT, handler);
+	while (1)
+	{
+		rl_replace_line("", 1);
+		str = readline("> ");
+		if (!str || ft_strcmp(str, limit) == 0)
+			break ;
+		write(fd, str, ft_strlen(str));
+		write(fd, "\n", 1);
+		free(str);
+		str = NULL;
+	}
+	close(fd);
+	++cnt;
+	// signal(SIGINT, handler_not_redis);
+	return (file_name);
+}
 
 char	*parsing(t_ast *tree, t_token *token_header)
 {
 	t_token	*p;
 
 	p = token_header->next;
-	if (p->type & PIPE)
+	if (p && p->type & PIPE)
 		return (SYNTAX_ERROR);
 	while (p)
 	{
-		syntax_pipe(tree, p, tree->root);
 		if (p->next ==  NULL && p->type & PIPE)
 			return (SYNTAX_ERROR);
+		if (p->token & T_RE_HEREDOC)
+			p->file_name = heredoc_input(p->s);
+		syntax_pipe(tree, p, tree->root);
 		p = p->next;
 	}
 	return (PASS);
@@ -83,7 +131,7 @@ void execute_something(t_ast *node, t_envs *e)
 		else
 		{
 			if (t->type == REDIRECT)
-				red_open_file(t->token, t->s);
+				red_open_file(t, t->s);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 15:19:36 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 18:25:39 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,19 @@ void	handler(int signum)
 		write(STDOUT_FILENO, "\n", 1);
 		if (rl_on_new_line() == -1)
 			exit(1);
-		rl_replace_line("", 1);
+		rl_replace_line("", 0);
 		rl_redisplay();
+	}
+}
+
+void	handler_not_redis(int signum)
+{
+	if (signum == SIGINT)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+		if (rl_on_new_line() == -1)
+			exit(1);
+		rl_replace_line("", 0);
 	}
 }
 
@@ -172,6 +183,7 @@ int main(int argc, char **argv, char **envp)
 				}
 				else
 				{
+					signal(SIGINT, handler_not_redis);
 					tree_searching(tree, &e);
 					dup_check(tree->root->std_fd[0], STDIN_FILENO);
 					dup_check(tree->root->std_fd[1], STDOUT_FILENO);
@@ -184,16 +196,18 @@ int main(int argc, char **argv, char **envp)
 			add_history(line);
 			free(line);
 			line = NULL;
+			write(STDOUT_FILENO, "\033[K", ft_strlen("\033[K"));
 		}
 		else
 		{
 			free_envs(&e);
-			// printf("\033[1A");
-			// printf("\033[11C");
+			printf("\033[1A");
+			printf("\033[11C");
 			printf("exit\n");
 			return (1);
 		}
 		wait_child();
+		signal(SIGINT, handler);
 	}
 	return (0);
 }
