@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 16:01:57 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/18 15:18:27 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # define NOT_VALID_ERROR "not a valid identifier"
 # define SYNTAX_ERROR "syntax error"
 # define UNCLOSED_Q "detected unclosed quote"
+# define PASS 0
 
 # define OVER_LONG_NUM 9223372036854775808UL
 
@@ -199,7 +200,7 @@ t_token	*create_new_token(void);
 // ==================================In parsing directory===========================================
 
 // ------------------------------------parsing.c----------------------------------------------------
-void	parsing(t_ast *tree, t_token *token_header);
+char	*parsing(t_ast *tree, t_token *token_header);
 void	execute_something(t_ast *node, t_envs *e);
 void	tree_searching(t_ast *node, t_envs *e);
 

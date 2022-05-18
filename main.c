@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 14:40:04 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 15:19:36 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ int main(int argc, char **argv, char **envp)
 		{
 			init_token_header(&token_header);
 			s = tokenizing(line, token_header, &e);
-			if (s != NULL)
+			if (s != PASS)
 			{
 				printf("%s\n", s);
 				free_token(token_header);
@@ -163,14 +163,23 @@ int main(int argc, char **argv, char **envp)
 			{
 				// print_token_list(token_header);
 				init_tree(&tree);
-				parsing(tree, token_header);
-				tree_searching(tree, &e);
-				dup_check(tree->root->std_fd[0], STDIN_FILENO);
-				dup_check(tree->root->std_fd[1], STDOUT_FILENO);
-				close(tree->root->std_fd[0]);
-				close(tree->root->std_fd[1]);
-				free_token(token_header);
-				free_tree(tree);
+				s = parsing(tree, token_header);
+				if (s != PASS)
+				{
+					printf("%s\n", s);
+					free_token(token_header);
+					free_tree(tree);
+				}
+				else
+				{
+					tree_searching(tree, &e);
+					dup_check(tree->root->std_fd[0], STDIN_FILENO);
+					dup_check(tree->root->std_fd[1], STDOUT_FILENO);
+					close(tree->root->std_fd[0]);
+					close(tree->root->std_fd[1]);
+					free_token(token_header);
+					free_tree(tree);
+				}
 			}
 			add_history(line);
 			free(line);
