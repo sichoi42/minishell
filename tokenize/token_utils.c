@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 22:15:25 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/15 14:52:31 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 17:23:47 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ void	free_token(t_token *t)
 		{
 			tmp = p->next;
 			free(p->s);
+			if (p->file_name)
+				free(p->file_name);
 			free(p);
 			p = tmp;
 		}
@@ -113,6 +115,7 @@ t_token	*create_new_token(void)
 	if (new == NULL)
 		exit(1);
 	new->next = NULL;
+	new->file_name = NULL;
 	new->token = T_INIT;
 	return (new);
 }

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 16:01:57 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/18 18:22:57 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # define NOT_VALID_ERROR "not a valid identifier"
 # define SYNTAX_ERROR "syntax error"
 # define UNCLOSED_Q "detected unclosed quote"
+# define PASS 0
 
 # define OVER_LONG_NUM 9223372036854775808UL
 
@@ -67,6 +68,7 @@ typedef struct	s_token
 	enum e_token		token; // 토큰
 	enum e_type			type; // 토큰의 타입
 	struct s_token		*next; // 토큰에 연결된 다음 노드
+	char				*file_name;
 }	t_token;
 
 typedef struct s_ast
@@ -199,7 +201,7 @@ t_token	*create_new_token(void);
 // ==================================In parsing directory===========================================
 
 // ------------------------------------parsing.c----------------------------------------------------
-void	parsing(t_ast *tree, t_token *token_header);
+char	*parsing(t_ast *tree, t_token *token_header);
 void	execute_something(t_ast *node, t_envs *e);
 void	tree_searching(t_ast *node, t_envs *e);
 
@@ -230,6 +232,7 @@ int		ft_strncmp(char *s1, char *s2, unsigned int n);
 void	turn_off_echoctl(void);
 void	turn_on_echoctl(void);
 void	handler(int signum);
+void	handler_not_redis(int signum);
 
 
 // swi
@@ -276,7 +279,7 @@ int					delete_env(t_envs *e, char *key);
 
 // redirect.c
 int					dup_check(int fd_l, int fd_r);
-int					red_open_file(enum e_token t, char *f_name);
+int					red_open_file(t_token *t, char *f_name);
 void				init_pipe(int *pipe_fd);
 void				close_pipe(int *pipe_fd);
 int					make_pipe(int *p_fd);
@@ -292,6 +295,12 @@ char				*make_oper_path(char *oper_path, char *path, char *oper);
 void				find_path(char ***paths, int *max_path, t_envs *e);
 char				*make_oper(char **opers, int max_path, char **paths);
 void				exe_oper(t_oper *o, t_ast *node, t_envs *e);
+
+
+// ft_itoa.c
+int					len_n(int n);
+char				*tr_str(int n, char *s, int len);
+char				*ft_itoa(int n);
 // ==================================================================
 
 

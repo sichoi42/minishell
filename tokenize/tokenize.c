@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 20:55:11 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/15 15:15:04 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 15:20:45 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,5 @@ char	*tokenizing(char *line, t_token *t, t_envs *e)
 			p = p->next;
 		}
 	}
-	return (NULL);
+	return (PASS);
 }

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:06 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 19:08:45 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 17:20:17 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ t_token	*ft_token_dup(t_token *src)
 	dst->token = src->token;
 	dst->type = src->type;
 	dst->s = ft_strdup(src->s);
+	dst->file_name = NULL;
+	if (src->file_name != NULL)
+		dst->file_name = ft_strdup(src->file_name);
 	dst->next = NULL;
 	return (dst);
 }
