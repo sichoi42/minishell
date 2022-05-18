@@ -161,43 +161,6 @@ char	*make_oper(char **opers, int max_path, char **paths)
 	return (oper_path);
 }
 
-/*
-void	exe_oper(t_oper *o, int *pipe_fd, char *envp[])
-{
-	int	pid;
-
-	pid = fork();
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-	if (pid == 0)
-	{
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
-		// pipe가 있으면
-		//dup_check(pipe_fd[1], STDOUT_FILENO);
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		// pipe가 있으면
-		// 빌트인 체크
-		// 빌트인이면 빌트인 실행
-		// 아니면
-		execve(o->oper_path, o->opers, envp);
-		print_error("bash", o->opers[0], strerror(errno), NULL);
-		exit(1);
-	}
-	else if (pid == -1)
-		exit(1);
-	// pipe가 있으면
-	//dup_check(pipe_fd[0], STDIN_FILENO);
-	//마지막일 경우
-	//close(STDIN_FILENO);
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-	signal(SIGINT, handler);
-	signal(SIGQUIT, SIG_IGN);
-}
-*/
-
 void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 {
 	int pid;
@@ -205,14 +168,11 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 	pid = fork();
 	if (pid == 0)
 	{
-		// signal(SIGINT, SIG_IGN);
-		// signal(SIGQUIT, SIG_IGN);
 		if (node->root->pipe_cnt > 0)
 			close_pipe(node->root->pipe_fd);
-		if (built_in_check(o, e) == -1)
+		if (built_in_check(o, e, node) == -1)
 		{
 			execve(o->oper_path, o->opers, e->env);
-			//print_error("bash", o->opers[0], strerror(errno), NULL);
 			print_error("bash", o->opers[0], COMMAND_ERROR, NULL);
 			exit(1);
 		}

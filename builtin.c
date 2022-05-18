@@ -23,7 +23,7 @@ int	ft_pwd(void)
 	return (OK);
 }
 
-int	ft_exit(t_oper *o)
+int	ft_exit(t_oper *o, t_ast *node)
 {
 	unsigned long long	num;
 
@@ -33,22 +33,19 @@ int	ft_exit(t_oper *o)
 		if (num == OVER_LONG_NUM)
 		{
 			print_error("bash", "exit", o->opers[1], NUMERIC_ERROR);
-			//printf("bash: exit: %s: %s\n", o->opers[i], NUMERIC_ERROR);
 			exit(255);
 		}
 		if (o->opers[2] != NULL)
 		{
 			print_error("bash", "exit", ARG_NUM_ERROR, NULL);
-			//printf("bash: exit: %s\n", ARG_NUM_ERROR);
 			return (1);
 		}
-		// single command면.
-		printf("exit\n");
-		printf("%lld\n", num % 256);
+		if (node->root->pipe_cnt == -1)
+			printf("exit\n");
 		exit(num % 256);
 	}
-	// single command면.
-	printf("exit\n");
+	if (node->root->pipe_cnt == -1)
+		printf("exit\n");
 	exit(OK);
 }
 
@@ -259,7 +256,7 @@ int	ft_cd(t_oper *o, t_envs *e)
  * g_exit_code에 값은 넣고, return은 check의 용도로만 쓸것인지 정해야함.
  */
 
-int	built_in_check(t_oper *o, t_envs *e)
+int	built_in_check(t_oper *o, t_envs *e, t_ast *node)
 {
 	int	len;
 
@@ -269,7 +266,7 @@ int	built_in_check(t_oper *o, t_envs *e)
 	else if (len == 5 && ft_strcmp("unset", o->opers[0]) == 0)
 		return (ft_unset(o, e));
 	else if (len == 4 && ft_strcmp("exit", o->opers[0]) == 0)
-		return (ft_exit(o));
+		return (ft_exit(o, node));
 	else
 	{
 		ft_tolower(&(o->opers[0]));
