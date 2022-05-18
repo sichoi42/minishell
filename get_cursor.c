@@ -11,10 +11,14 @@ int main()
 	int 	ret;
 	int		row;
 	int		col;
+	int		fd;
 	char	buf[1024];
 
-	write(STDOUT_FILENO, "\033[6n", strlen("\033[6n"));
-	ret = read(STDIN_FILENO, buf, 1024);
+	fd = open("tmp.txt", O_CREAT | O_RDWR);
+	write(fd, "\033[6n", strlen("\033[6n"));
+	close(fd);
+	fd = open("tmp.txt", O_RDONLY);
+	ret = read(fd, buf, 1024);
 	buf[ret] = 0;
 	i = 0;
 	while (!isdigit(buf[i]))
@@ -26,5 +30,6 @@ int main()
 		++i;
 	col = atoi(&buf[i]) - 1;
 	printf("%d, %d\n", row, col);
-    return 0;
+	// unlink("tmp.txt");
+	return 0;
 }

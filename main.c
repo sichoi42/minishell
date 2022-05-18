@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 01:10:29 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 14:40:04 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,24 @@ void	turn_off_echoctl(void)
 {
 	struct termios	term;
 
-	tcgetattr(STDIN_FILENO, &term);
-	term.c_lflag &= ~ECHOCTL;
-	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	if (isatty(STDIN_FILENO))
+	{
+		tcgetattr(STDIN_FILENO, &term);
+		term.c_lflag &= ~ECHOCTL;
+		tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	}
+	else if (isatty(STDOUT_FILENO))
+	{
+		tcgetattr(STDOUT_FILENO, &term);
+		term.c_lflag &= ~ECHOCTL;
+		tcsetattr(STDOUT_FILENO, TCSANOW, &term);
+	}
+	else if (isatty(STDERR_FILENO))
+	{
+		tcgetattr(STDERR_FILENO, &term);
+		term.c_lflag &= ~ECHOCTL;
+		tcsetattr(STDERR_FILENO, TCSANOW, &term);
+	}
 }
 
 void	turn_on_echoctl(void)
@@ -164,8 +179,8 @@ int main(int argc, char **argv, char **envp)
 		else
 		{
 			free_envs(&e);
-			printf("\033[1A");
-			printf("\033[11C");
+			// printf("\033[1A");
+			// printf("\033[11C");
 			printf("exit\n");
 			return (1);
 		}
