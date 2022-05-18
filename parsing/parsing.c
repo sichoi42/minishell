@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 18:31:00 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 20:20:36 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,15 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-// void	handler_here_doc(int signum)
-// {
-
-// }
+void	handler_here_doc(int signum)
+{
+	if (signum)
+	{
+		g_exit_code = 130;
+		write(STDOUT_FILENO, "\n", 1);
+		close(STDIN_FILENO);
+	}
+}
 
 char	*heredoc_input(char *limit)
 {
@@ -32,6 +37,7 @@ char	*heredoc_input(char *limit)
 	char		*file_name;
 	int			fd;
 	static int	cnt;
+	int			temp_stdin;
 
 	s = ft_itoa(cnt);
 	if (s == 0)
@@ -43,13 +49,19 @@ char	*heredoc_input(char *limit)
 		print_error("bash", file_name, strerror(errno), NULL);
 		// return (WRONG_ACTION);
 	}
-	// signal(SIGINT, handler);
+	temp_stdin = dup(STDIN_FILENO);
+	signal(SIGINT, handler_here_doc);
 	while (1)
 	{
 		rl_replace_line("", 1);
 		str = readline("> ");
-		if (!str || ft_strcmp(str, limit) == 0)
+		if (g_exit_code == 130)
 			break ;
+		if (!str || ft_strcmp(str, limit) == 0)
+		{
+			free(str);
+			break ;
+		}
 		write(fd, str, ft_strlen(str));
 		write(fd, "\n", 1);
 		free(str);
@@ -57,7 +69,8 @@ char	*heredoc_input(char *limit)
 	}
 	close(fd);
 	++cnt;
-	// signal(SIGINT, handler_not_redis);
+	dup_check(temp_stdin, STDIN_FILENO);
+	signal(SIGINT, handler_not_redis);
 	return (file_name);
 }
 
