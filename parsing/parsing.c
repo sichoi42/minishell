@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 20:20:36 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 22:17:20 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ void execute_something(t_ast *node, t_envs *e)
 
 	if (node->tree_type == TREE_BUNDLE)
 	{
+		--(node->root->pipe_cnt);
 		init_pipe(node->root->pipe_fd);
 		dup_check(node->root->std_fd[1], STDOUT_FILENO);
 		if (node->root->pipe_cnt > 0)

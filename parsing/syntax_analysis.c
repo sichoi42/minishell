@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 19:03:00 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 19:55:43 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 22:16:29 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ int	syntax_pipe(t_ast *node, t_token *t, t_ast *root)
 	int	i;
 
 	i = -1;
-	while (++i < root->pipe_cnt)
+	while (++i < root->pipe_cnt - 1)
 		node = node->right;
 	if (t->type & PIPE)
 	{
 		if (node->root->pipe_cnt == -1)
-			node->root->pipe_cnt = 1;
+			node->root->pipe_cnt = 2;
 		else
 			++(node->root->pipe_cnt);
 		node->right = create_new_node(root, TREE_PIPE);
