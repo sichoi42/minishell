@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 22:17:20 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/18 22:51:09 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void exe_command(t_ast *node, t_envs *e)
 	// builtin 후에 path를 찾는 방식으로 로직수정 필요.
 	find_path(&(p.paths), &(p.max_len), e);
 	o.oper_path = make_oper(o.opers, p.max_len, p.paths);
-	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e) == -1)
+	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e, node) == -1)
 		exe_oper(&o, node, e);
 	else if (node->root->pipe_cnt >= 0)
 		exe_oper(&o, node, e);

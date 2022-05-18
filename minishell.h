@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 18:22:57 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 22:53:27 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,13 +260,13 @@ int					input_env(t_envs *e, char *env[]);
 
 // builtin.c
 int					ft_pwd(void);
-int					ft_exit(t_oper *o);
+int					ft_exit(t_oper *o, t_ast *node);
 int					ft_env(t_envs *e);
 int					ft_unset(t_oper *o, t_envs *e);
 int					ft_export(t_oper *o, t_envs *e);
 int					ft_echo(t_oper *o);
 int					ft_cd(t_oper *o, t_envs *e);
-int					built_in_check(t_oper *o, t_envs *e);
+int					built_in_check(t_oper *o, t_envs *e, t_ast *node);
 
 // env.c
 void				print_export(t_envs *e);
