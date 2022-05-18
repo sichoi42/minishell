@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 18:25:39 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 20:34:52 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ void	init_token_header(t_token **token_header)
 	if (*token_header == NULL)
 		exit(1);
 	(*token_header)->s = NULL;
+	(*token_header)->file_name = NULL;
 	(*token_header)->next = NULL;
 }
 
@@ -196,7 +197,6 @@ int main(int argc, char **argv, char **envp)
 			add_history(line);
 			free(line);
 			line = NULL;
-			write(STDOUT_FILENO, "\033[K", ft_strlen("\033[K"));
 		}
 		else
 		{
