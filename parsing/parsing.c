@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/17 18:15:30 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/17 23:09:32 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ void execute_something(t_ast *node, t_envs *e)
 		t = node->token;
 		if (node->tree_type == TREE_CMD)
 		{
+			turn_on_echoctl();
 			exe_command(node, e);
 		}
 		else

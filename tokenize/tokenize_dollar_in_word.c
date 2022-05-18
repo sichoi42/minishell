@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 20:57:57 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 18:16:05 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/18 15:05:29 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*dollar_in_word(char **start, char **end, enum e_token *t, t_envs *e)
 	char	*s;
 
 	++(*end);
-	if (**end == 0 || is_space(**end) || ft_strchr("\"\'|><$", **end))
+	if (**end == 0 || is_space(**end) || ft_strchr("\"\'|><$/", **end))
 	{
 		if (ft_strchr("\"\'", **end))
 			s = ft_strdup("");
@@ -49,7 +49,7 @@ char	*dollar_in_word(char **start, char **end, enum e_token *t, t_envs *e)
 	}
 	else
 	{
-		while (**end && !is_space(**end) && !ft_strchr("\"\'|><$", **end))
+		while (**end && !is_space(**end) && !ft_strchr("\"\'|><$/", **end))
 			++(*end);
 		++(*start);
 		s = key_to_value(start, *end, e);
