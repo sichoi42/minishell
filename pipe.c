@@ -212,7 +212,8 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 		if (built_in_check(o, e) == -1)
 		{
 			execve(o->oper_path, o->opers, e->env);
-			print_error("bash", o->opers[0], strerror(errno), NULL);
+			//print_error("bash", o->opers[0], strerror(errno), NULL);
+			print_error("bash", o->opers[0], COMMAND_ERROR, NULL);
 			exit(1);
 		}
 		exit(0);
