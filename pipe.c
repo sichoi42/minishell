@@ -225,5 +225,4 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 		close(STDIN_FILENO);
 	if (node->root->pipe_cnt > 0)
 		close_pipe(node->root->pipe_fd);
-	node->root->pipe_cnt -= 1;
 }
