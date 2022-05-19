@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 20:57:57 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 15:05:29 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/19 17:09:26 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*dollar_in_word(char **start, char **end, enum e_token *t, t_envs *e)
 	}
 	else if (**end == '?')
 	{
-		s = ft_strndup("$?", 2);
+		s = ft_itoa(g_exit_code);
 		*t |= T_EXIT_CODE;
 		++(*end);
 	}
@@ -70,11 +70,11 @@ char	*dollar_in_quote(char **start, char **end, enum e_token *t, t_envs *e)
 	d_end = *start + 1;
 	if (*d_end == '?')
 	{
+		s = ft_itoa(g_exit_code);
 		*t |= T_EXIT_CODE;
 		++d_end;
-		s = ft_strdup("$?");
 	}
-	else if (is_space(*d_end) || ft_strchr("\"\'|><$", *d_end))
+	else if (is_space(*d_end) || ft_strchr("\"\'|><$/", *d_end))
 	{
 		if (ft_strchr("\"\'", **end))
 			s = ft_strdup("");
@@ -82,7 +82,7 @@ char	*dollar_in_quote(char **start, char **end, enum e_token *t, t_envs *e)
 	}
 	else
 	{
-		while (*d_end && !is_space(*d_end) && !ft_strchr("\"\'|><$", *d_end))
+		while (*d_end && !is_space(*d_end) && !ft_strchr("\"\'|><$/", *d_end))
 			++d_end;
 		++(*start);
 		s = key_to_value(start, d_end, e);
