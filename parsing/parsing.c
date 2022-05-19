@@ -6,29 +6,20 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 22:51:09 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/19 22:28:25 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-
-void	handler_here_doc(int signum)
-{
-	if (signum)
-	{
-		g_exit_code = 130;
-		write(STDOUT_FILENO, "\n", 1);
-		close(STDIN_FILENO);
-	}
-}
+#include <signal.h>
 
 char	*heredoc_input(char *limit)
 {
@@ -55,8 +46,6 @@ char	*heredoc_input(char *limit)
 	{
 		rl_replace_line("", 1);
 		str = readline("> ");
-		if (g_exit_code == 130)
-			break ;
 		if (!str || ft_strcmp(str, limit) == 0)
 		{
 			free(str);
@@ -70,7 +59,7 @@ char	*heredoc_input(char *limit)
 	close(fd);
 	++cnt;
 	dup_check(temp_stdin, STDIN_FILENO);
-	signal(SIGINT, handler_not_redis);
+	signal(SIGINT, handler_no_redisplay);
 	return (file_name);
 }
 
@@ -140,7 +129,9 @@ void execute_something(t_ast *node, t_envs *e)
 		if (node->tree_type == TREE_CMD)
 		{
 			turn_on_echoctl();
+			signal(SIGQUIT, handler);
 			exe_command(node, e);
+			signal(SIGQUIT, SIG_IGN);
 		}
 		else
 		{

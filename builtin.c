@@ -207,7 +207,8 @@ int	ft_echo(t_oper *o)
 		if (first++ != 1)
 			printf(" ");
 		printf("%s", o->opers[i]);
-		g_echo_len += ft_strlen(o->opers[i]);
+		if (option == 1)
+			g_echo_len += ft_strlen(o->opers[i]);
 		++i;
 	}
 	if (option == 0)

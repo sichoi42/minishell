@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/19 16:46:40 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/19 22:29:49 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,34 +15,10 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <errno.h>
-
-void	handler(int signum)
-{
-	if (signum == SIGINT)
-	{
-		write(STDOUT_FILENO, "\n", 1);
-		if (rl_on_new_line() == -1)
-			exit(1);
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-}
-
-void	handler_not_redis(int signum)
-{
-	if (signum == SIGINT)
-	{
-		write(STDOUT_FILENO, "\n", 1);
-		if (rl_on_new_line() == -1)
-			exit(1);
-		rl_replace_line("", 0);
-	}
-}
 
 void	init_token_header(t_token **token_header)
 {
@@ -72,10 +48,24 @@ void	init_tree(t_ast **tree)
 static void wait_child(void)
 {
 	int	status;
+	int	ret;
 
+	status = -1;
 	while (waitpid(-1, &status, 0) >= 0)
-		;
-	g_exit_code = status >> 8;
+	{
+		if (WIFEXITED(status))
+			ret = WEXITSTATUS(status);
+		else
+		{
+			ret = WTERMSIG(status);
+			if (ret == SIGQUIT)
+				write(STDERR_FILENO, "Quit: 3", 7);
+			write(STDERR_FILENO, "\n", 1);
+			ret = 128 + ret;
+		}
+	}
+	if (status != -1)
+		g_exit_code = ret;
 }
 
 void	eof_exit(int col, int row)
@@ -88,7 +78,7 @@ void	eof_exit(int col, int row)
 int main(int argc, char **argv, char **envp)
 {
 	char			*line;
-	t_token			*token_header; // token 리스트의 헤더.
+	t_token			*token_header;
 	t_ast			*tree;
 	t_envs			e;
 	char			*s;
@@ -119,6 +109,7 @@ int main(int argc, char **argv, char **envp)
 		}
 		init_token_header(&token_header);
 		s = tokenizing(line, token_header, &e);
+		g_exit_code = 0;
 		if (s != PASS)
 		{
 			printf("%s\n", s);
@@ -126,7 +117,6 @@ int main(int argc, char **argv, char **envp)
 		}
 		else
 		{
-			// print_token_list(token_header);
 			init_tree(&tree);
 			s = parsing(tree, token_header);
 			if (s != PASS)
@@ -137,7 +127,7 @@ int main(int argc, char **argv, char **envp)
 			}
 			else
 			{
-				signal(SIGINT, handler_not_redis);
+				signal(SIGINT, handler_no_redisplay);
 				tree_searching(tree, &e);
 				dup_check(tree->root->std_fd[0], STDIN_FILENO);
 				dup_check(tree->root->std_fd[1], STDOUT_FILENO);

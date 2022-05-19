@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/19 17:12:39 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/19 22:27:51 by sichoi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,8 @@ CFLAGS = -Wall -Wextra -Werror -g
 LIB_NAME = readline
 LIB_DIR = $(shell brew --prefix readline)/lib/
 LIB_INC = $(shell brew --prefix readline)/include/
+INC = minishell.h
+
 GREEN = \033[0;32m
 RED = \033[0;31m
 RESET = \033[0m
@@ -34,6 +36,7 @@ FUNC = ./tokenize/print_token_info\
 		./parsing/syntax_analysis\
 		./term/cursor\
 		./term/termios\
+		./signal/signal\
 		basic\
 		builtin\
 		env\
@@ -50,10 +53,10 @@ OBJ = $(addsuffix .o, $(FUNC))
 
 %.o : %.c
 	@echo "$(NAME)$$ $(GREEN) compiling... $< $(CHECK) $(RESET)"
-	@$(CC) $(CFLAGS) -o $@ -c $< -I $(LIB_INC)
+	@$(CC) $(CFLAGS) -I $(INC) -o $@ -c $< -I $(LIB_INC)
 
 $(NAME) : $(OBJ)
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -l $(LIB_NAME) -lcurses -I $(LIB_INC) -L $(LIB_DIR)
+	@$(CC) $(CFLAGS) -I $(INC) -o $(NAME) $(OBJ) -l $(LIB_NAME) -lcurses -I $(LIB_INC) -L $(LIB_DIR)
 	@echo "$(NAME)$$ $(GREEN) $(NAME) was created! $(RESET)"
 
 all : $(NAME)

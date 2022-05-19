@@ -6,12 +6,12 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 22:15:25 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 20:28:48 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/19 22:21:13 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
 #include <stdlib.h>
+#include "../minishell.h"
 
 void	free_token(t_token *t)
 {
