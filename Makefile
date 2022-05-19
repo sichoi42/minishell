@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/19 16:47:31 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/19 17:12:39 by sichoi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,11 +14,8 @@ NAME = minishell
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g
 LIB_NAME = readline
-# LIB_DIR = $(shell brew --prefix readline)/lib/
-# LIB_INC = $(shell brew --prefix readline)/include/
-
-LIB_DIR = /opt/homebrew/Cellar/readline/8.1.2/lib/
-LIB_INC = /opt/homebrew/Cellar/readline/8.1.2/include/
+LIB_DIR = $(shell brew --prefix readline)/lib/
+LIB_INC = $(shell brew --prefix readline)/include/
 GREEN = \033[0;32m
 RED = \033[0;31m
 RESET = \033[0m
