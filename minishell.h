@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/19 22:28:53 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/19 23:10:58 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,6 +241,22 @@ void	move_cursor(int col, int row);
 void	handler(int signum);
 void	handler_no_redisplay(int signum);
 void	handler_here_doc(int signum);
+
+// ===================================In runtime directory==========================================
+
+// -----------------------------------exit.c--------------------------------------------------------
+void	wait_child(void);
+void	eof_exit(int col, int row);
+
+// -----------------------------------init.c--------------------------------------------------------
+void	init_token_header(t_token **token_header);
+void	init_tree(t_ast **tree);
+
+// -----------------------------------loop.c--------------------------------------------------------
+int		token_block(char *line, t_token **token_header, t_envs *e);
+int		parsing_block(t_ast **tree, t_token *token_header);
+void	readline_check(char **line, t_envs *e);
+void	loop(t_envs *e);
 
 // ==================================================================
 

@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/19 22:27:51 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/19 22:55:45 by sichoi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,6 +37,9 @@ FUNC = ./tokenize/print_token_info\
 		./term/cursor\
 		./term/termios\
 		./signal/signal\
+		./runtime/exit\
+		./runtime/init\
+		./runtime/loop\
 		basic\
 		builtin\
 		env\
