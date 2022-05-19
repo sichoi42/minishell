@@ -193,6 +193,7 @@ int	ft_echo(t_oper *o)
 	int	first;
 	int	option;
 
+	g_echo_len = 0;
 	option = 0;
 	i = 0;
 	while (o->opers[++i] != NULL)
@@ -205,7 +206,9 @@ int	ft_echo(t_oper *o)
 	{
 		if (first++ != 1)
 			printf(" ");
-		printf("%s", o->opers[i++]);
+		printf("%s", o->opers[i]);
+		g_echo_len += ft_strlen(o->opers[i]);
+		++i;
 	}
 	if (option == 0)
 		printf("\n");

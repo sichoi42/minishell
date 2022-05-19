@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 22:53:27 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/19 16:55:42 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ typedef struct s_oper {
 }	t_oper;
 
 int	g_exit_code;
-
+int g_echo_len;
 
 // ===========================================sichoi================================================
 
@@ -218,8 +218,24 @@ t_token	*ft_token_dup(t_token *src);
 char	*get_tree_type_str(enum e_tree_type tree_type);
 void	free_tree(t_ast *node);
 
-// ==================================================================
+// ===================================In term directory==============================================
 
+
+// -----------------------------------termios.c------------------------------------------------------
+void	turn_off_echoctl(void);
+void	turn_on_echoctl(void);
+void	enable_canonical(void);
+void	disable_canonical(void);
+
+// -----------------------------------cursor.c-------------------------------------------------------
+int		over_long_long(const char *str, int sign);
+int		ft_sichoi_atoi(const char *str);
+void	get_position(int *col, int *row);
+int		ft_putchar(int c);
+void	init_query(const char **cm);
+void	move_cursor(int col, int row);
+
+// ==================================================================
 
 // utils.c
 int		ft_strlen(char *s);
@@ -250,6 +266,7 @@ int					ft_strlcmp(char *l, char *r, int len);
 int					ft_strcmp(char *l, char *r);
 void				ft_tolower(char **str);
 char				*ft_strcat(char *org, char *target);
+int					is_digit(int c);
 
 // free.c
 void				free_envs(t_envs *e);
