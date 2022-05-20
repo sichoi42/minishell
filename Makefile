@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/19 22:55:45 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/20 19:43:22 by swi              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,9 @@ FUNC = ./tokenize/print_token_info\
 		./runtime/init\
 		./runtime/loop\
 		basic\
-		builtin\
+		./builtin/builtin\
+		./builtin/pwd_exit_env\
+		./builtin/unset_export\
 		env\
 		free\
 		input_env\
