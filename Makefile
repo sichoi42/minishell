@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/20 21:44:56 by swi              ###   ########.fr        #
+#    Updated: 2022/05/21 01:10:45 by sichoi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,6 +53,7 @@ FUNC = ./tokenize/print_token_info\
 		./base/malloc_array\
 		./base/print_error\
 		./base/dup_check\
+		./base/utils\
 		./builtin/builtin\
 		./builtin/pwd_exit_env\
 		./builtin/unset_export\
@@ -66,8 +67,7 @@ FUNC = ./tokenize/print_token_info\
 		./free/free\
 		./pipe/make_init_close\
 		main\
-		./redirect/redirect\
-		utils\
+		./redirect/redirect
 
 SRC = $(addsuffix .c, $(FUNC))
 OBJ = $(addsuffix .o, $(FUNC))

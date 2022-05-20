@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/21 00:50:36 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/21 01:07:45 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,35 +95,7 @@ char	*parsing(t_ast *tree, t_token *token_header)
 	return (PASS);
 }
 
-void	exe_command(t_ast *node, t_envs *e)
-{
-	t_oper	o;
-	t_paths	p;
-	t_token	*t;
-	int		i;
-
-	o.opers = malloc_array(sizeof(char *), node->argc + 1);
-	o.opers[node->argc] = NULL;
-	i = -1;
-	t = node->token;
-	while (t)
-	{
-		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(t->s) + 1);
-		ft_strcpy(t->s, o.opers[i]);
-		t = t->next;
-	}
-	find_path(&(p.paths), &(p.max_len), e);
-	o.oper_path = make_oper(o.opers, p.max_len, p.paths);
-	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e, node) == -1)
-		exe_oper(&o, node, e);
-	else if (node->root->pipe_cnt >= 0)
-		exe_oper(&o, node, e);
-	free(o.oper_path);
-	free_double_char(o.opers);
-	free_double_char(p.paths);
-}
-
-void	execute_something(t_ast *node, t_envs *e)
+void	execute_bundle(t_ast *node, t_envs *e)
 {
 	t_token	*t;
 
@@ -154,7 +126,7 @@ void	execute_something(t_ast *node, t_envs *e)
 // preorder로 트리를 탐색.
 void	tree_searching(t_ast *node, t_envs *e)
 {
-	execute_something(node, e);
+	execute_bundle(node, e);
 	if (node->left != NULL)
 		tree_searching(node->left, e);
 	if (node->right != NULL)

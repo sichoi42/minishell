@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 20:55:11 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 15:20:45 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/21 01:02:08 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,23 @@ t_token	*token_split(char **start, char **end, enum e_token *token, t_envs *e)
 	return (new);
 }
 
+char	*check_token_error(t_token *new)
+{
+	if (new == NULL)
+		return (UNCLOSED_Q);
+	if (new->type & REDIRECT)
+		if (new->type & PIPE || new->type & STAR || !ft_strcmp(new->s, ""))
+			return (SYNTAX_ERROR);
+	return (PASS);
+}
+
 // 받아온 line에서 토큰을 하나씩 받아서 linked list에 연결.
 char	*tokenizing(char *line, t_token *t, t_envs *e)
 {
 	char			*start;
 	char			*end;
+	char			*check;
 	enum e_token	token;
-	t_token			*new;
 	t_token			*p;
 
 	end = line;
@@ -55,13 +65,10 @@ char	*tokenizing(char *line, t_token *t, t_envs *e)
 		moving_two_pointers(&start, &end);
 		if (*start)
 		{
-			new = token_split(&start, &end, &token, e);
-			if (new == NULL)
-				return (UNCLOSED_Q);
-			if (new->type & REDIRECT)
-				if (new->type & PIPE || new->type & STAR || !ft_strncmp(new->s, "", 1))
-					return (SYNTAX_ERROR);
-			p->next = new;
+			p->next = token_split(&start, &end, &token, e);
+			check = check_token_error(p->next);
+			if (check != PASS)
+				return (check);
 			p = p->next;
 		}
 	}

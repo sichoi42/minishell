@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/21 00:54:12 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/21 01:18:58 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@
 # define PASS 0
 
 # define OVER_LONG_NUM 9223372036854775808UL
-# include <sys/ioctl.h>
 
 // 사용되는 토큰
 enum e_token
@@ -59,34 +58,37 @@ enum e_type
 // parse tree의 type
 enum e_tree_type
 {
-	TREE_PIPE, TREE_BUNDLE, TREE_RE, TREE_CMD
+	TREE_PIPE,
+	TREE_BUNDLE,
+	TREE_RE,
+	TREE_CMD
 };
 
 // 각 토큰들을 linked list로 저장.
-typedef struct	s_token
+typedef struct s_token
 {
-	char				*s; // 담긴 문자열
-	enum e_token		token; // 토큰
-	enum e_type			type; // 토큰의 타입
-	struct s_token		*next; // 토큰에 연결된 다음 노드
+	char				*s;
+	enum e_token		token;
+	enum e_type			type;
+	struct s_token		*next;
 	char				*file_name;
 }	t_token;
 
 typedef struct s_ast
 {
-	t_token				*token; // 토큰 구조체
-	struct s_ast		*left; // 왼쪽 자식
-	struct s_ast		*right; // 오른쪽 자식
-	struct s_ast		*root; // 루트 노드 정보
-	enum e_tree_type	tree_type; // 트리의 타입
-	int					pipe_cnt; // 파이프 개수
+	t_token				*token;
+	struct s_ast		*left;
+	struct s_ast		*right;
+	struct s_ast		*root;
+	enum e_tree_type	tree_type;
+	int					pipe_cnt;
 	int					argc;
 	int					pipe_fd[2];
 	int					std_fd[2];
 	int					pid;
 }	t_ast;
 
-typedef	struct s_command
+typedef struct s_command
 {
 	char	*cmd;
 	char	*path;
@@ -154,44 +156,45 @@ typedef struct s_oper {
 
 int	g_exit_code;
 
-// ===========================================sichoi================================================
+// ===========================================sichoi===========================
 
-// ====================================In tokenize directory========================================
+// ====================================In tokenize directory===================
 
-// ------------------------------------tokenize.c---------------------------------------------------
+// ------------------------------------tokenize.c------------------------------
 void	moving_two_pointers(char **start, char **end);
 t_token	*token_split(char **start, char **end, enum e_token *token, t_envs *e);
+char	*check_token_error(t_token *new);
 char	*tokenizing(char *line, t_token *t, t_envs *e);
 
-// ------------------------------------tokenize_word.c----------------------------------------------
+// ------------------------------------tokenize_word.c-------------------------
 void	join_normal_word(char **s, char **start, char **end);
 void	move_quote_end(char **start, char **end);
 t_token	*treat_unclosed_quote(t_token **new, char **s);
 void	fill_word_info(t_token **new, char *s, enum e_token *token);
 t_token	*tokenize_word(char **start, char **end, enum e_token *token, t_envs *e);
 
-// ------------------------------------tokenize_quote_in_word.c-------------------------------------
+// ------------------------------------tokenize_quote_in_word.c----------------
 char	*quote_in_word(char **start, char **end, enum e_token *token, t_envs *e);
 
-// ------------------------------------tokenize_dollar_in_word.c------------------------------------
+// ------------------------------------tokenize_dollar_in_word.c---------------
 char	*key_to_value(char **start, char *end, t_envs *e);
 char	*dollar_in_word(char **start, char **end, enum e_token *t, t_envs *e);
 char	*dollar_in_quote(char **start, char **end, enum e_token *t, t_envs *e);
 
-// -----------------------------------tokenize_redirect.c-------------------------------------------
+// -----------------------------------tokenize_redirect.c----------------------
 void	get_redirect_token(char **start, char **end, enum e_token *token);
 t_token	*tokenize_redirect(char **start, char **end, enum e_token *t, t_envs *e);
 
-// -----------------------------------tokenize_one_elem.c-------------------------------------------
+// -----------------------------------tokenize_one_elem.c----------------------
 t_token	*tokenize_pipe(char **end, enum e_token *token);
 t_token	*tokenize_star(char **end, enum e_token *token);
 
-// -----------------------------------print_token_info.c--------------------------------------------
+// -----------------------------------print_token_info.c-----------------------
 void	print_token_str(enum e_token token);
 void	print_type_str(enum e_type type);
 void	print_token_list(t_token *t);
 
-// -----------------------------------token_utils.c-------------------------------------------------
+// -----------------------------------token_utils.c----------------------------
 void	free_token(t_token *t);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strnjoin(char *s1, char *s2, int len);
@@ -199,64 +202,64 @@ char	*ft_strchr(char *s, char c);
 t_token	*create_new_token(void);
 
 
-// ==================================In parsing directory===========================================
+// ==================================In parsing directory======================
 
-// ------------------------------------parsing.c----------------------------------------------------
+// ------------------------------------parsing.c-------------------------------
 void	heredoc_loop(char *limit, int fd);
 char	*heredoc_input(char *limit);
 char	*parsing(t_ast *tree, t_token *token_header);
 void	exe_command(t_ast *node, t_envs *e);
-void	execute_something(t_ast *node, t_envs *e);
+void	execute_bundle(t_ast *node, t_envs *e);
 void	tree_searching(t_ast *node, t_envs *e);
 
 
-// -----------------------------------syntax_analysis.c---------------------------------------------
+// -----------------------------------syntax_analysis.c------------------------
 int		syntax_pipe(t_ast *node, t_token *t, t_ast *root);
 int		syntax_bundle(t_ast *node, t_token *t, t_ast *root);
 int		syntax_redirect(t_ast *node, t_token *t, t_ast *root);
 void	syntax_decision_redirect(t_ast *node, t_token *t, t_ast *root);
 int		syntax_cmd(t_ast *node, t_token *t, t_ast *root);
 
-// -----------------------------------parse_utils.c-------------------------------------------------
+// -----------------------------------parse_utils.c----------------------------
 t_ast	*create_new_node(t_ast *root, enum e_tree_type tree_type);
 t_token	*ft_token_dup(t_token *src);
 char	*get_tree_type_str(enum e_tree_type tree_type);
 void	free_tree(t_ast *node);
 
-// ===================================In term directory=============================================
+// ===================================In term directory========================
 
 
-// -----------------------------------termios.c-----------------------------------------------------
+// -----------------------------------termios.c--------------------------------
 void	turn_off_echoctl(void);
 void	turn_on_echoctl(void);
 void	enable_canonical(void);
 void	disable_canonical(void);
 
-// -----------------------------------cursor.c------------------------------------------------------
+// -----------------------------------cursor.c---------------------------------
 int		ft_sichoi_atoi(const char *str);
 void	get_position(int *col, int *row);
 int		ft_putchar(int c);
 void	init_query(const char **cm);
 void	move_cursor(int col, int row);
 
-// ===================================In signal directory===========================================
+// ===================================In signal directory======================
 
-// -----------------------------------signal.c------------------------------------------------------
+// -----------------------------------signal.c---------------------------------
 void	handler(int signum);
 void	handler_no_redisplay(int signum);
 void	handler_here_doc(int signum);
 
-// ===================================In runtime directory==========================================
+// ===================================In runtime directory=====================
 
-// -----------------------------------exit.c--------------------------------------------------------
+// -----------------------------------exit.c-----------------------------------
 void	wait_child(int pid);
 void	eof_exit(int col, int row);
 
-// -----------------------------------init.c--------------------------------------------------------
+// -----------------------------------init.c-----------------------------------
 void	init_token_header(t_token **token_header);
 void	init_tree(t_ast **tree);
 
-// -----------------------------------loop.c--------------------------------------------------------
+// -----------------------------------loop.c-----------------------------------
 int		token_block(char *line, t_token **token_header, t_envs *e);
 int		parsing_block(t_ast **tree, t_token *token_header);
 void	readline_check(char **line, t_envs *e);

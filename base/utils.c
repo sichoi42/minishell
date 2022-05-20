@@ -6,11 +6,11 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:15:59 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/15 16:16:00 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/21 01:12:38 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 #include <stdlib.h>
 
 int	ft_strlen(char *s)
@@ -69,7 +69,8 @@ char	*ft_strndup(char *src, int len)
 
 int	is_space(char c)
 {
-	if (c == ' ' || c == '\n' || c == '\t' || c == '\v' || c == '\f' || c == '\r')
+	if (c == ' ' || c == '\n' || c == '\t' || c == '\v'
+		|| c == '\f' || c == '\r')
 		return (1);
 	return (0);
 }

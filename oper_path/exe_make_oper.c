@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipe.c                                             :+:      :+:    :+:   */
+/*   exe_make_oper.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: swi <swi@student.42seoul.kr>               +#+  +:+       +#+        */
+/*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/20 20:00:11 by swi               #+#    #+#             */
-/*   Updated: 2022/05/20 20:00:13 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/21 01:07:49 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,4 +100,32 @@ void	exe_oper(t_oper *o, t_ast *node, t_envs *e)
 		close(STDIN_FILENO);
 	if (node->root->pipe_cnt > 0)
 		close_pipe(node->root->pipe_fd);
+}
+
+void	exe_command(t_ast *node, t_envs *e)
+{
+	t_oper	o;
+	t_paths	p;
+	t_token	*t;
+	int		i;
+
+	o.opers = malloc_array(sizeof(char *), node->argc + 1);
+	o.opers[node->argc] = NULL;
+	i = -1;
+	t = node->token;
+	while (t)
+	{
+		o.opers[++i] = malloc_array(sizeof(char), ft_strlen(t->s) + 1);
+		ft_strcpy(t->s, o.opers[i]);
+		t = t->next;
+	}
+	find_path(&(p.paths), &(p.max_len), e);
+	o.oper_path = make_oper(o.opers, p.max_len, p.paths);
+	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e, node) == -1)
+		exe_oper(&o, node, e);
+	else if (node->root->pipe_cnt >= 0)
+		exe_oper(&o, node, e);
+	free(o.oper_path);
+	free_double_char(o.opers);
+	free_double_char(p.paths);
 }
