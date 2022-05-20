@@ -17,7 +17,7 @@ int	dup_check(int fd_l, int fd_r)
 	if (rtn == -1)
 	{
 		// 추후 struct 정해지면 파일이름 추가해서 에러 출력
-		print_error("bash", strerror(errno), NULL, NULL);
+		print_error("minishell", strerror(errno), NULL, NULL);
 		exit(1);
 	}
 	return (OK);
@@ -30,7 +30,7 @@ static int	red_here_doc(char *file_name)
 	fd = open(file_name, O_RDWR);
 	if (fd == -1)
 	{
-		print_error("bash", file_name, strerror(errno), NULL);
+		print_error("minishell", file_name, strerror(errno), NULL);
 		return (WRONG_ACTION);
 	}
 	unlink(file_name);
@@ -43,7 +43,7 @@ static int	red_in(char *f_name)
 
 	fd = open(f_name, O_RDWR);
 	if (fd == -1)
-		print_error("bash", f_name, strerror(errno), NULL);
+		print_error("minishell", f_name, strerror(errno), NULL);
 	else
 	{
 		dup_check(fd, STDIN_FILENO);
@@ -59,7 +59,7 @@ static int	red_out(char *f_name)
 
 	fd = open(f_name, O_RDWR | O_CREAT | O_TRUNC, 0664);
 	if (fd == -1)
-		print_error("bash", f_name, strerror(errno), NULL);
+		print_error("minishell", f_name, strerror(errno), NULL);
 	else
 	{
 		dup_check(fd, STDOUT_FILENO);
@@ -75,7 +75,7 @@ static int	red_append(char *f_name)
 
 	fd = open(f_name, O_WRONLY | O_CREAT | O_APPEND, 0664);
 	if (fd == -1)
-		print_error("bash", f_name, strerror(errno), NULL);
+		print_error("minishell", f_name, strerror(errno), NULL);
 	else
 	{
 		dup_check(fd, STDOUT_FILENO);
@@ -125,7 +125,7 @@ int	make_pipe(int *p_fd)
 	rtn = pipe(p_fd);
 	if (rtn == -1)
 	{
-		print_error("bash", strerror(errno), NULL, NULL);
+		print_error("minishell", strerror(errno), NULL, NULL);
 		exit(1);
 	}
 	dup_check(p_fd[1], STDOUT_FILENO);

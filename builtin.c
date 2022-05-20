@@ -13,7 +13,7 @@ int	ft_pwd(void)
 	path = getcwd(NULL, 0);
 	if (path ==  NULL)
 	{
-		print_error("bash", "pwd", strerror(errno), NULL);
+		print_error("minishell", "pwd", strerror(errno), NULL);
 		//printf("bash: %s: %s\n", "pwd", strerror(errno));
 		return (ERROR);
 	}
@@ -32,12 +32,12 @@ int	ft_exit(t_oper *o, t_ast *node)
 		num = ft_atoi(o->opers[1]);
 		if (num == OVER_LONG_NUM)
 		{
-			print_error("bash", "exit", o->opers[1], NUMERIC_ERROR);
+			print_error("minishell", "exit", o->opers[1], NUMERIC_ERROR);
 			exit(255);
 		}
 		if (o->opers[2] != NULL)
 		{
-			print_error("bash", "exit", ARG_NUM_ERROR, NULL);
+			print_error("minishell", "exit", ARG_NUM_ERROR, NULL);
 			return (1);
 		}
 		if (node->root->pipe_cnt == -1)
@@ -90,7 +90,7 @@ static int	error_key(char *oper, char *arg)
 	err_arg[0] = '`';
 	ft_strcat(arg, err_arg);
 	ft_strcat("\'", err_arg);
-	print_error("bash", oper, err_arg, NOT_VALID_ERROR);
+	print_error("minishell", oper, err_arg, NOT_VALID_ERROR);
 	return (ERROR);
 }
 
@@ -193,7 +193,6 @@ int	ft_echo(t_oper *o)
 	int	first;
 	int	option;
 
-	g_col_offset = 0;
 	option = 0;
 	i = 0;
 	while (o->opers[++i] != NULL)
@@ -206,10 +205,7 @@ int	ft_echo(t_oper *o)
 	{
 		if (first++ != 1)
 			printf(" ");
-		// printf("%s", o->opers[i]);
 		write(STDOUT_FILENO, o->opers[i], ft_strlen(o->opers[i]));
-		// if (option == 1)
-		// 	g_col_offset += ft_strlen(o->opers[i]);
 		++i;
 	}
 	if (option == 0)
@@ -238,7 +234,7 @@ int	ft_cd(t_oper *o, t_envs *e)
 	{
 		if (chdir(o->opers[1]) != OK)
 		{
-			print_error("bash", "cd", o->opers[1], strerror(errno));
+			print_error("minishell", "cd", o->opers[1], strerror(errno));
 			return (ERROR);
 		}
 		return (set_pwd(e, o->opers[1]));
@@ -246,12 +242,12 @@ int	ft_cd(t_oper *o, t_envs *e)
 	temp = get_env_value(e, "HOME");
 	if (temp == NULL)
 	{
-		print_error("bash", "cd", "HOME not set", NULL);
+		print_error("minishell", "cd", "HOME not set", NULL);
 		return (ERROR);
 	}
 	if (chdir(temp) != OK)
 	{
-		print_error("bash", "cd", o->opers[1], strerror(errno));
+		print_error("minishell", "cd", o->opers[1], strerror(errno));
 		return (ERROR);
 	}
 	return (set_pwd(e, temp));

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 16:36:50 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 13:33:17 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 14:52:04 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <term.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
+#include <string.h>
 #define CURPOS "\033[6n"
 
 int	over_long_long(const char *str, int sign)
@@ -99,8 +101,13 @@ void	move_cursor(int col, int row)
 	const char		*cm;
 	struct winsize	size;
 
+	(void)col;
+	(void)row;
 	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &size) == -1)
+	{
+		print_error("minishell", strerror(errno), NULL, NULL);
 		exit(1);
+	}
 	init_query(&cm);
-	tputs(tgoto(cm, (col) % size.ws_col, row), 0, ft_putchar);
+	tputs(tgoto(cm, (col + 11) % size.ws_col, row - 1), 0, ft_putchar);
 }

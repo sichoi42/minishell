@@ -33,7 +33,7 @@ void	*malloc_array(int size, int len)
 	temp = malloc(size * len);
 	if (temp == NULL)
 	{
-		print_error("bash", strerror(errno), NULL, NULL);
+		print_error("minishell", strerror(errno), NULL, NULL);
 		exit(1);
 	}
 	return (temp);
