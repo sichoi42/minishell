@@ -216,3 +216,10 @@ char	*ft_strcat(char *org, char *target)
 	target[i] = '\0';
 	return (target);
 }
+
+int	is_digit(int c)
+{
+	if (c >= '0' && c <= '9')
+		return (1);
+	return (0);
+}

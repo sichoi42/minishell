@@ -6,12 +6,12 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 22:12:39 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/12 18:02:19 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/19 22:20:48 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
 #include <stdio.h>
+#include "../minishell.h"
 
 // token 정보를 문자열로 출력.
 void	print_token_str(enum e_token token)

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 22:53:27 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/20 14:08:59 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,6 @@ typedef struct s_oper {
 
 int	g_exit_code;
 
-
 // ===========================================sichoi================================================
 
 // ====================================In tokenize directory========================================
@@ -218,8 +217,47 @@ t_token	*ft_token_dup(t_token *src);
 char	*get_tree_type_str(enum e_tree_type tree_type);
 void	free_tree(t_ast *node);
 
-// ==================================================================
+// ===================================In term directory=============================================
 
+
+// -----------------------------------termios.c-----------------------------------------------------
+void	turn_off_echoctl(void);
+void	turn_on_echoctl(void);
+void	enable_canonical(void);
+void	disable_canonical(void);
+
+// -----------------------------------cursor.c------------------------------------------------------
+int		over_long_long(const char *str, int sign);
+int		ft_sichoi_atoi(const char *str);
+void	get_position(int *col, int *row);
+int		ft_putchar(int c);
+void	init_query(const char **cm);
+void	move_cursor(int col, int row);
+
+// ===================================In signal directory===========================================
+
+// -----------------------------------signal.c------------------------------------------------------
+void	handler(int signum);
+void	handler_no_redisplay(int signum);
+void	handler_here_doc(int signum);
+
+// ===================================In runtime directory==========================================
+
+// -----------------------------------exit.c--------------------------------------------------------
+void	wait_child(void);
+void	eof_exit(int col, int row);
+
+// -----------------------------------init.c--------------------------------------------------------
+void	init_token_header(t_token **token_header);
+void	init_tree(t_ast **tree);
+
+// -----------------------------------loop.c--------------------------------------------------------
+int		token_block(char *line, t_token **token_header, t_envs *e);
+int		parsing_block(t_ast **tree, t_token *token_header);
+void	readline_check(char **line, t_envs *e);
+void	loop(t_envs *e);
+
+// ==================================================================
 
 // utils.c
 int		ft_strlen(char *s);
@@ -227,12 +265,6 @@ char	*ft_strndup(char *src, int len);
 char	*ft_strdup(char *src);
 int		is_space(char c);
 int		ft_strncmp(char *s1, char *s2, unsigned int n);
-
-// main.c
-void	turn_off_echoctl(void);
-void	turn_on_echoctl(void);
-void	handler(int signum);
-void	handler_not_redis(int signum);
 
 
 // swi
@@ -250,6 +282,7 @@ int					ft_strlcmp(char *l, char *r, int len);
 int					ft_strcmp(char *l, char *r);
 void				ft_tolower(char **str);
 char				*ft_strcat(char *org, char *target);
+int					is_digit(int c);
 
 // free.c
 void				free_envs(t_envs *e);
