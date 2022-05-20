@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 22:35:07 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 14:43:31 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 16:32:37 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	loop(t_envs *e)
 			{
 				signal(SIGINT, handler_no_redisplay);
 				tree_searching(tree, e);
+				wait_child(tree->root->pid);
 				dup_check(tree->root->std_fd[0], STDIN_FILENO);
 				dup_check(tree->root->std_fd[1], STDOUT_FILENO);
 				close(tree->root->std_fd[0]);
@@ -93,7 +94,6 @@ void	loop(t_envs *e)
 		}
 		add_history(line);
 		free(line);
-		wait_child();
 		signal(SIGINT, handler);
 	}
 }

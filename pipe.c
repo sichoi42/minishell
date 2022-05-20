@@ -180,6 +180,8 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 	}
 	else if (pid == -1)
 		exit(1);
+	else
+		node->root->pid = pid;
 	if (node->root->pipe_cnt > 0)
 		dup_check(node->root->pipe_fd[0], STDIN_FILENO);
 	else if (node->root->pipe_cnt == 0)

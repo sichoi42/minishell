@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 22:53:20 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 14:47:58 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 16:23:41 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,32 +16,32 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-void	wait_child(void)
+void	wait_child(int pid)
 {
 	int	status;
 	int	ret;
 
 	status = -1;
-	while (waitpid(-1, &status, 0) >= 0)
+	if (waitpid(pid, &status, 0) >= 0)
 	{
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
+		if ((status & 0177) == 0)
+			ret = (status >> 8) & 0x000000ff;
 		else
 		{
-			ret = WTERMSIG(status);
+			ret = status & 0177;
 			if (ret == SIGQUIT)
-				write(STDERR_FILENO, "Quit: 3\n", 8);
+				print_error("Quit", "3", NULL, NULL);
 			ret = 128 + ret;
 		}
 	}
 	if (status != -1)
 		g_exit_code = ret;
+	while (waitpid(-1, &status, 0) >= 0)
+		;
 }
 
 void	eof_exit(int col, int row)
 {
-	(void)col;
-	(void)row;
 	move_cursor(col, row);
 	printf("exit\n");
 	close(STDOUT_FILENO);

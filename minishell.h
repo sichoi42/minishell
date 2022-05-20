@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 14:08:59 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 16:22:06 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ typedef struct s_ast
 	int					argc;
 	int					pipe_fd[2];
 	int					std_fd[2];
+	int					pid;
 }	t_ast;
 
 typedef	struct s_command
@@ -244,7 +245,7 @@ void	handler_here_doc(int signum);
 // ===================================In runtime directory==========================================
 
 // -----------------------------------exit.c--------------------------------------------------------
-void	wait_child(void);
+void	wait_child(int pid);
 void	eof_exit(int col, int row);
 
 // -----------------------------------init.c--------------------------------------------------------

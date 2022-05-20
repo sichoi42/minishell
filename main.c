@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 16:16:18 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/19 23:06:35 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 15:34:36 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int main(int argc, char **argv, char **envp)
 	if (argc > 1)
 		return (1);
 	(void)argv;
-	(void)envp;
 	input_env(&e, envp);
 	signal(SIGINT, handler);
 	signal(SIGQUIT, SIG_IGN);
