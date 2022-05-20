@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 14:52:21 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 17:34:52 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,7 @@ char	*heredoc_input(char *limit)
 	file_name = ft_strjoin(ft_strdup(TEMP_FILE), s);
 	fd = open(file_name, O_RDWR | O_CREAT | O_TRUNC, 0664);
 	if (fd == -1)
-	{
-		print_error("minishell", file_name, strerror(errno), NULL);
-		// return (WRONG_ACTION);
-	}
+		return (NULL);
 	temp_stdin = dup(STDIN_FILENO);
 	signal(SIGINT, handler_here_doc);
 	while (1)
@@ -75,7 +72,11 @@ char	*parsing(t_ast *tree, t_token *token_header)
 		if (p->next ==  NULL && p->type & PIPE)
 			return (SYNTAX_ERROR);
 		if (p->token & T_RE_HEREDOC)
+		{
 			p->file_name = heredoc_input(p->s);
+			if (p->file_name == NULL)
+				return (strerror(errno));
+		}
 		syntax_pipe(tree, p, tree->root);
 		p = p->next;
 	}
@@ -117,7 +118,8 @@ void execute_something(t_ast *node, t_envs *e)
 
 	if (node->tree_type == TREE_BUNDLE)
 	{
-		--(node->root->pipe_cnt);
+		if (node->root->pipe_cnt != -1)
+			--(node->root->pipe_cnt);
 		init_pipe(node->root->pipe_fd);
 		dup_check(node->root->std_fd[1], STDOUT_FILENO);
 		if (node->root->pipe_cnt > 0)

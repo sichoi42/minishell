@@ -14,7 +14,6 @@ int	ft_pwd(void)
 	if (path ==  NULL)
 	{
 		print_error("minishell", "pwd", strerror(errno), NULL);
-		//printf("bash: %s: %s\n", "pwd", strerror(errno));
 		return (ERROR);
 	}
 	else
@@ -30,6 +29,8 @@ int	ft_exit(t_oper *o, t_ast *node)
 	if (o->opers[1] != NULL)
 	{
 		num = ft_atoi(o->opers[1]);
+		if (node->root->pipe_cnt == -1)
+			print_error("exit", NULL, NULL, NULL);
 		if (num == OVER_LONG_NUM)
 		{
 			print_error("minishell", "exit", o->opers[1], NUMERIC_ERROR);
@@ -40,12 +41,10 @@ int	ft_exit(t_oper *o, t_ast *node)
 			print_error("minishell", "exit", ARG_NUM_ERROR, NULL);
 			return (1);
 		}
-		if (node->root->pipe_cnt == -1)
-			printf("exit\n");
 		exit(num % 256);
 	}
 	if (node->root->pipe_cnt == -1)
-		printf("exit\n");
+		print_error("exit", NULL, NULL, NULL);
 	exit(OK);
 }
 
@@ -230,7 +229,7 @@ int	ft_cd(t_oper *o, t_envs *e)
 {
 	char	*temp;
 
-	if (o->opers[1] != NULL)
+	if (o->opers[1] != NULL && *(o->opers[1]) != '\0')
 	{
 		if (chdir(o->opers[1]) != OK)
 		{
@@ -259,28 +258,28 @@ int	ft_cd(t_oper *o, t_envs *e)
 
 int	built_in_check(t_oper *o, t_envs *e, t_ast *node)
 {
-	int	len;
+	int	rtn;
 
-	len = ft_strlen(o->opers[0]);
-	if (len == 6 && ft_strcmp("export", o->opers[0]) == 0)
-		return (ft_export(o, e));
-	else if (len == 5 && ft_strcmp("unset", o->opers[0]) == 0)
-		return (ft_unset(o, e));
-	else if (len == 4 && ft_strcmp("exit", o->opers[0]) == 0)
-		return (ft_exit(o, node));
+	if (ft_strcmp("export", o->opers[0]) == 0)
+		rtn = (ft_export(o, e));
+	else if (ft_strcmp("unset", o->opers[0]) == 0)
+		rtn = (ft_unset(o, e));
+	else if (ft_strcmp("exit", o->opers[0]) == 0)
+		rtn = (ft_exit(o, node));
 	else
 	{
 		ft_tolower(&(o->opers[0]));
-		if (len == 4 && ft_strcmp("echo", o->opers[0]) == 0)
-			return (ft_echo(o));
-		else if (len == 2 && ft_strcmp("cd", o->opers[0]) == 0)
-			return (ft_cd(o, e));
-		else if (len == 3 && ft_strcmp("pwd", o->opers[0]) == 0)
-			return (ft_pwd());
-		else if (len == 3 && ft_strcmp("env", o->opers[0]) == 0)
-			return (ft_env(e));
+		if (ft_strcmp("echo", o->opers[0]) == 0)
+			rtn = (ft_echo(o));
+		else if (ft_strcmp("cd", o->opers[0]) == 0)
+			rtn = (ft_cd(o, e));
+		else if (ft_strcmp("pwd", o->opers[0]) == 0)
+			rtn = (ft_pwd());
+		else if (ft_strcmp("env", o->opers[0]) == 0)
+			rtn = (ft_env(e));
 		else
-			return (-1);
+			rtn = (-1);
 	}
-	return (OK);
+	g_exit_code = rtn;
+	return (rtn);
 }

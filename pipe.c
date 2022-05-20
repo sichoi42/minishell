@@ -176,7 +176,7 @@ void exe_oper(t_oper *o, t_ast *node, t_envs *e)
 			print_error("minishell", o->opers[0], COMMAND_ERROR, NULL);
 			exit(1);
 		}
-		exit(0);
+		exit(g_exit_code);
 	}
 	else if (pid == -1)
 		exit(1);

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 22:35:07 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 16:32:37 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/20 18:17:11 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <errno.h>
 
 int	token_block(char *line, t_token **token_header, t_envs *e)
 {
@@ -27,7 +28,8 @@ int	token_block(char *line, t_token **token_header, t_envs *e)
 	g_exit_code = 0;
 	if (s != PASS)
 	{
-		printf("%s\n", s);
+		g_exit_code = 258;
+		print_error("minishell", s, NULL, NULL);
 		free_token(*token_header);
 		return (WRONG_ACTION);
 	}
@@ -42,7 +44,11 @@ int	parsing_block(t_ast **tree, t_token *token_header)
 	s = parsing(*tree, token_header);
 	if (s != PASS)
 	{
-		printf("%s\n", s);
+		if (ft_strcmp(s, SYNTAX_ERROR) == 0)
+			g_exit_code = 258;
+		else
+			g_exit_code = 1;
+		print_error("minishell", s, NULL, NULL);
 		free_token(token_header);
 		free_tree(*tree);
 		return (WRONG_ACTION);
