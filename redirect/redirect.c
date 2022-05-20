@@ -1,27 +1,20 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirect.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: swi <swi@student.42seoul.kr>               +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/20 21:36:06 by swi               #+#    #+#             */
+/*   Updated: 2022/05/20 21:42:05 by swi              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+#include <fcntl.h>
+#include <unistd.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-
-// dup2와 error check까지
-int	dup_check(int fd_l, int fd_r)
-{
-	int	rtn;
-
-	rtn = dup2(fd_l, fd_r);
-	if (rtn == -1)
-	{
-		// 추후 struct 정해지면 파일이름 추가해서 에러 출력
-		print_error("minishell", strerror(errno), NULL, NULL);
-		exit(1);
-	}
-	return (OK);
-}
 
 static int	red_here_doc(char *file_name)
 {
@@ -39,7 +32,7 @@ static int	red_here_doc(char *file_name)
 
 static int	red_in(char *f_name)
 {
-	int fd;
+	int	fd;
 
 	fd = open(f_name, O_RDWR);
 	if (fd == -1)
@@ -55,7 +48,7 @@ static int	red_in(char *f_name)
 
 static int	red_out(char *f_name)
 {
-	int fd;
+	int	fd;
 
 	fd = open(f_name, O_RDWR | O_CREAT | O_TRUNC, 0664);
 	if (fd == -1)
@@ -71,7 +64,7 @@ static int	red_out(char *f_name)
 
 static int	red_append(char *f_name)
 {
-	int fd;
+	int	fd;
 
 	fd = open(f_name, O_WRONLY | O_CREAT | O_APPEND, 0664);
 	if (fd == -1)
@@ -85,14 +78,6 @@ static int	red_append(char *f_name)
 	return (WRONG_ACTION);
 }
 
-/*
- * 오픈 하는 건 완료
- * 함수 완료 후 에러 발생시 나머지 리다이렉션에 대한 처리는 따로 필요
- * red 값은 무조건 4가지 중 하나만 들어온다는 가정으로 만듬.
- * append 모두 처리 필요, fd값 하나로 정리 필요(fclose해야함.)
- * here_doc의 경우 f_name에 ".이름" 방식으로 이름 넣기.
- */
-// 리다이렉션 오픈하는 함수 + heredoc 실행까지
 int	red_open_file(t_token *t, char *f_name)
 {
 	if (t->token & T_RE_INPUT)
@@ -104,30 +89,4 @@ int	red_open_file(t_token *t, char *f_name)
 	else if (t->token & T_RE_HEREDOC)
 		return (red_here_doc(t->file_name));
 	return (WRONG_ACTION);
-}
-
-void	init_pipe(int *pipe_fd)
-{
-	pipe_fd[0] = -1;
-	pipe_fd[1] = -1;
-}
-
-void	close_pipe(int *pipe_fd)
-{
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-}
-
-int	make_pipe(int *p_fd)
-{
-	int	rtn;
-
-	rtn = pipe(p_fd);
-	if (rtn == -1)
-	{
-		print_error("minishell", strerror(errno), NULL, NULL);
-		exit(1);
-	}
-	dup_check(p_fd[1], STDOUT_FILENO);
-	return (0);
 }

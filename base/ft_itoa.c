@@ -6,12 +6,13 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 18:34:37 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/18 16:57:27 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 21:21:01 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 int	len_n(int n)
 {

@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/20 19:43:22 by swi              ###   ########.fr        #
+#    Updated: 2022/05/20 21:44:56 by swi              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,18 +40,34 @@ FUNC = ./tokenize/print_token_info\
 		./runtime/exit\
 		./runtime/init\
 		./runtime/loop\
-		basic\
+		./base/ft_atoi\
+		./base/ft_itoa\
+		./base/ft_max\
+		./base/ft_realloc\
+		./base/ft_strcat\
+		./base/ft_strcmp\
+		./base/ft_strcpy\
+		./base/ft_strlen_c\
+		./base/ft_tolower\
+		./base/is_digit\
+		./base/malloc_array\
+		./base/print_error\
+		./base/dup_check\
 		./builtin/builtin\
 		./builtin/pwd_exit_env\
 		./builtin/unset_export\
-		env\
-		free\
-		input_env\
+		./oper_path/exe_make_oper\
+		./oper_path/find_path_etc\
+		./env/input_env\
+		./env/insert\
+		./env/print\
+		./env/search_get_delete\
+		./env/set_env\
+		./free/free\
+		./pipe/make_init_close\
 		main\
-		pipe\
-		redirect\
+		./redirect/redirect\
 		utils\
-		ft_itoa\
 
 SRC = $(addsuffix .c, $(FUNC))
 OBJ = $(addsuffix .o, $(FUNC))

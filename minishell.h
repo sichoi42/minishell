@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 16:22:06 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/20 19:50:55 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,10 +322,7 @@ int					make_pipe(int *p_fd);
 void				count_words_alloc(char ***paths, char *org, char div[], int *count);
 void				count_word_alloc(char *org, char **words, char *div, int *max_len);
 void				fill_array(char *org, char **words, char *div, int count);
-char				*make_oper_path(char *oper_path, char *path, char *oper);
-//void				find_path(char ***paths, int *max_path);
-//char				*make_oper(char ***opers, int max_path, char **paths, char *argv);
-//void				exe_oper(t_oper *o, int *pipe_fd, char *envp[]);
+//char				*make_oper_path(char *oper_path, char *path, char *oper);
 void				find_path(char ***paths, int *max_path, t_envs *e);
 char				*make_oper(char **opers, int max_path, char **paths);
 void				exe_oper(t_oper *o, t_ast *node, t_envs *e);
