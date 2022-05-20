@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 17:34:52 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/21 00:50:36 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,34 @@
 #include <readline/history.h>
 #include <signal.h>
 
+void	heredoc_loop(char *limit, int fd)
+{
+	int		col;
+	int		row;
+	char	*line;
+
+	while (1)
+	{
+		disable_canonical();
+		get_position(&col, &row);
+		enable_canonical();
+		line = readline("> ");
+		if (!line)
+			move_cursor(col + 2, row);
+		if (!line || ft_strcmp(line, limit) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(fd, line, ft_strlen(line));
+		write(fd, "\n", 1);
+		free(line);
+		line = NULL;
+	}
+}
+
 char	*heredoc_input(char *limit)
 {
-	char		*str;
 	char		*s;
 	char		*file_name;
 	int			fd;
@@ -39,20 +64,7 @@ char	*heredoc_input(char *limit)
 		return (NULL);
 	temp_stdin = dup(STDIN_FILENO);
 	signal(SIGINT, handler_here_doc);
-	while (1)
-	{
-		rl_replace_line("", 1);
-		str = readline("> ");
-		if (!str || ft_strcmp(str, limit) == 0)
-		{
-			free(str);
-			break ;
-		}
-		write(fd, str, ft_strlen(str));
-		write(fd, "\n", 1);
-		free(str);
-		str = NULL;
-	}
+	heredoc_loop(limit, fd);
 	close(fd);
 	++cnt;
 	dup_check(temp_stdin, STDIN_FILENO);
@@ -69,7 +81,7 @@ char	*parsing(t_ast *tree, t_token *token_header)
 		return (SYNTAX_ERROR);
 	while (p)
 	{
-		if (p->next ==  NULL && p->type & PIPE)
+		if (p->next == NULL && p->type & PIPE)
 			return (SYNTAX_ERROR);
 		if (p->token & T_RE_HEREDOC)
 		{
@@ -83,12 +95,12 @@ char	*parsing(t_ast *tree, t_token *token_header)
 	return (PASS);
 }
 
-void exe_command(t_ast *node, t_envs *e)
+void	exe_command(t_ast *node, t_envs *e)
 {
-	t_oper o;
-	t_paths p;
+	t_oper	o;
+	t_paths	p;
 	t_token	*t;
-	int i;
+	int		i;
 
 	o.opers = malloc_array(sizeof(char *), node->argc + 1);
 	o.opers[node->argc] = NULL;
@@ -100,7 +112,6 @@ void exe_command(t_ast *node, t_envs *e)
 		ft_strcpy(t->s, o.opers[i]);
 		t = t->next;
 	}
-	// builtin 후에 path를 찾는 방식으로 로직수정 필요.
 	find_path(&(p.paths), &(p.max_len), e);
 	o.oper_path = make_oper(o.opers, p.max_len, p.paths);
 	if (node->root->pipe_cnt <= -1 && built_in_check(&o, e, node) == -1)
@@ -112,9 +123,9 @@ void exe_command(t_ast *node, t_envs *e)
 	free_double_char(p.paths);
 }
 
-void execute_something(t_ast *node, t_envs *e)
+void	execute_something(t_ast *node, t_envs *e)
 {
-	t_token *t;
+	t_token	*t;
 
 	if (node->tree_type == TREE_BUNDLE)
 	{
@@ -135,48 +146,10 @@ void execute_something(t_ast *node, t_envs *e)
 			exe_command(node, e);
 			signal(SIGQUIT, SIG_IGN);
 		}
-		else
-		{
-			if (t->type == REDIRECT)
-				red_open_file(t, t->s);
-		}
+		else if (t->type == REDIRECT)
+			red_open_file(t, t->s);
 	}
 }
-
-/*
-void	execute_something(t_ast *node, t_envs *e)
-{
-	t_token	*t;
-
-	(void)e;
-	printf("%s\n", get_tree_type_str(node->tree_type));
-	if (node->token != NULL)
-	{
-		t = node->token;
-		if (node->tree_type == TREE_CMD)
-		{
-			// 커맨드일 때, next가 있기 때문에
-			printf("command in: ");
-			while (t)
-			{
-				printf("%s ", t->s);
-				t = t->next;
-			}
-			printf("\n");
-			printf("argc: %d\n", node->argc);
-			printf("pipe: %d\n", node->root->pipe_cnt);
-		}
-		else
-		{
-			// 커맨드 그 외의 것들(pipe, redirection). next == NULL
-			printf("not command: ");
-			printf("%s\n", t->s);
-		}
-		print_token_list(t);
-	}
-	printf("------------------\n");
-}
-*/
 
 // preorder로 트리를 탐색.
 void	tree_searching(t_ast *node, t_envs *e)

@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 22:35:07 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 18:17:11 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/21 00:52:55 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,14 @@ void	readline_check(char **line, t_envs *e)
 	}
 }
 
+void	put_std_fd_in_root(t_ast *tree)
+{
+	dup_check(tree->root->std_fd[0], STDIN_FILENO);
+	dup_check(tree->root->std_fd[1], STDOUT_FILENO);
+	close(tree->root->std_fd[0]);
+	close(tree->root->std_fd[1]);
+}
+
 void	loop(t_envs *e)
 {
 	char			*line;
@@ -90,10 +98,7 @@ void	loop(t_envs *e)
 				signal(SIGINT, handler_no_redisplay);
 				tree_searching(tree, e);
 				wait_child(tree->root->pid);
-				dup_check(tree->root->std_fd[0], STDIN_FILENO);
-				dup_check(tree->root->std_fd[1], STDOUT_FILENO);
-				close(tree->root->std_fd[0]);
-				close(tree->root->std_fd[1]);
+				put_std_fd_in_root(tree);
 				free_token(token_header);
 				free_tree(tree);
 			}

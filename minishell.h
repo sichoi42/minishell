@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:14 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 19:50:55 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/21 00:54:12 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 # define PASS 0
 
 # define OVER_LONG_NUM 9223372036854775808UL
+# include <sys/ioctl.h>
 
 // 사용되는 토큰
 enum e_token
@@ -201,9 +202,13 @@ t_token	*create_new_token(void);
 // ==================================In parsing directory===========================================
 
 // ------------------------------------parsing.c----------------------------------------------------
+void	heredoc_loop(char *limit, int fd);
+char	*heredoc_input(char *limit);
 char	*parsing(t_ast *tree, t_token *token_header);
+void	exe_command(t_ast *node, t_envs *e);
 void	execute_something(t_ast *node, t_envs *e);
 void	tree_searching(t_ast *node, t_envs *e);
+
 
 // -----------------------------------syntax_analysis.c---------------------------------------------
 int		syntax_pipe(t_ast *node, t_token *t, t_ast *root);
@@ -228,7 +233,6 @@ void	enable_canonical(void);
 void	disable_canonical(void);
 
 // -----------------------------------cursor.c------------------------------------------------------
-int		over_long_long(const char *str, int sign);
 int		ft_sichoi_atoi(const char *str);
 void	get_position(int *col, int *row);
 int		ft_putchar(int c);
@@ -257,6 +261,7 @@ int		token_block(char *line, t_token **token_header, t_envs *e);
 int		parsing_block(t_ast **tree, t_token *token_header);
 void	readline_check(char **line, t_envs *e);
 void	loop(t_envs *e);
+
 
 // ==================================================================
 

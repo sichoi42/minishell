@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 16:36:50 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 14:52:04 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/21 00:54:17 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,6 @@
 #include <errno.h>
 #include <string.h>
 #define CURPOS "\033[6n"
-
-int	over_long_long(const char *str, int sign)
-{
-	int			i;
-
-	i = 0;
-	while (str[i] - '0' >= 0 && str[i] - '0' <= 9)
-		i++;
-	if (i >= 20 && sign == -1)
-		return (0);
-	else if (i >= 20 && sign == 1)
-		return (-1);
-	return (1);
-}
 
 int	ft_sichoi_atoi(const char *str)
 {
@@ -49,10 +35,6 @@ int	ft_sichoi_atoi(const char *str)
 		sign *= -1;
 		str++;
 	}
-	if (over_long_long(str, sign) == 0)
-		return (0);
-	else if (over_long_long(str, sign) == -1)
-		return (-1);
 	num = 0;
 	while (*str - '0' >= 0 && *str - '0' <= 9)
 	{
@@ -101,13 +83,10 @@ void	move_cursor(int col, int row)
 	const char		*cm;
 	struct winsize	size;
 
-	(void)col;
-	(void)row;
 	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &size) == -1)
-	{
-		print_error("minishell", strerror(errno), NULL, NULL);
-		exit(1);
-	}
+		return ;
 	init_query(&cm);
-	tputs(tgoto(cm, (col + 11) % size.ws_col, row - 1), 0, ft_putchar);
+	if (row == size.ws_row - 1)
+		--row;
+	tputs(tgoto(cm, col % size.ws_col, row), 2, ft_putchar);
 }
