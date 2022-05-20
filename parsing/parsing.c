@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/19 22:28:25 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 14:00:35 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ char	*heredoc_input(char *limit)
 	}
 	temp_stdin = dup(STDIN_FILENO);
 	signal(SIGINT, handler_here_doc);
+	++g_col_offset;
 	while (1)
 	{
 		rl_replace_line("", 1);

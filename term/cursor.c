@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 16:36:50 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/19 16:54:59 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 13:33:17 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,5 +102,5 @@ void	move_cursor(int col, int row)
 	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &size) == -1)
 		exit(1);
 	init_query(&cm);
-	tputs(tgoto(cm, (g_echo_len + col + 11) % size.ws_col, row - 1), 0, ft_putchar);
+	tputs(tgoto(cm, (col) % size.ws_col, row), 0, ft_putchar);
 }
