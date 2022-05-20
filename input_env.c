@@ -82,7 +82,7 @@ int	input_env(t_envs *e, char *env[])
 	e->pwd = getcwd(NULL, 0);
 	if (e->pwd == NULL)
 	{
-		print_error("bash", strerror(errno), NULL, NULL);
+		print_error("minishell", strerror(errno), NULL, NULL);
 		return (1);
 	}
 	return (0);
