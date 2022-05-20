@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 22:35:07 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 18:17:11 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/20 20:43:23 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,11 @@ int	parsing_block(t_ast **tree, t_token *token_header)
 
 void	readline_check(char **line, t_envs *e)
 {
-	int	row;
-	int	col;
+	int	row = 0;
+	int	col = 0;
+
+	(void)row;
+	(void)col;
 
 	turn_off_echoctl();
 	disable_canonical();

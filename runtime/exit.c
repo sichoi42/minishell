@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 22:53:20 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 16:23:41 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/20 20:43:27 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,9 @@ void	wait_child(int pid)
 
 void	eof_exit(int col, int row)
 {
-	move_cursor(col, row);
+	(void)col;
+	(void)row;
+	move_cursor(col + 11, row);
 	printf("exit\n");
 	close(STDOUT_FILENO);
 }

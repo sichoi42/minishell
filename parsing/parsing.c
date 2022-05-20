@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 18:59:08 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 17:34:52 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/20 19:52:26 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ char	*heredoc_input(char *limit)
 	int			fd;
 	static int	cnt;
 	int			temp_stdin;
+	int			row;
+	int			col;
 
 	s = ft_itoa(cnt);
 	if (s == 0)
@@ -41,10 +43,13 @@ char	*heredoc_input(char *limit)
 	signal(SIGINT, handler_here_doc);
 	while (1)
 	{
-		rl_replace_line("", 1);
+		disable_canonical();
+		get_position(&col, &row);
+		enable_canonical();
 		str = readline("> ");
 		if (!str || ft_strcmp(str, limit) == 0)
 		{
+			move_cursor(col + 2, row);
 			free(str);
 			break ;
 		}

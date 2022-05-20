@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 16:36:50 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 14:52:04 by sichoi           ###   ########.fr       */
+/*   Updated: 2022/05/20 20:44:19 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,8 @@ void	move_cursor(int col, int row)
 		print_error("minishell", strerror(errno), NULL, NULL);
 		exit(1);
 	}
+	if (size.ws_row - 1 == row)
+		--row;
 	init_query(&cm);
-	tputs(tgoto(cm, (col + 11) % size.ws_col, row - 1), 0, ft_putchar);
+	tputs(tgoto(cm, (col) % size.ws_col, row), 0, ft_putchar);
 }
