@@ -6,7 +6,7 @@
 #    By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 14:52:17 by sichoi            #+#    #+#              #
-#    Updated: 2022/05/21 01:10:45 by sichoi           ###   ########.fr        #
+#    Updated: 2022/05/21 14:02:31 by swi              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -83,7 +83,7 @@ $(NAME) : $(OBJ)
 all : $(NAME)
 
 norm :
-	Norminette tokenize/*.c parsing/*.c *.c
+	Norminette *.h *.c */*.c
 
 clean :
 	@rm -f $(OBJ)
