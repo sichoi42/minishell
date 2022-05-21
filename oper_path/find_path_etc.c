@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   find_path_etc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: swi <swi@student.42seoul.kr>               +#+  +:+       +#+        */
+/*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/20 20:00:01 by swi               #+#    #+#             */
-/*   Updated: 2022/05/20 20:00:05 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/21 17:52:21 by sichoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 #include <unistd.h>
+#include <stdlib.h>
 
 void	count_words_alloc(char ***paths, char *org, char div[], int *count)
 {
@@ -104,6 +105,13 @@ void	find_path(char ***paths, int *max_path, t_envs *e)
 
 	path = get_env_value(e, "PATH");
 	count = 0;
+	if (path == NULL)
+	{
+		*max_path = 1;
+		*paths = malloc(sizeof(char *));
+		(*paths)[0] = NULL;
+		return ;
+	}
 	count_words_alloc(paths, path, ":", &count);
 	count_word_alloc(path, *paths, ":", max_path);
 	fill_array(path, *paths, ":", count);
