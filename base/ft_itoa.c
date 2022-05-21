@@ -6,7 +6,7 @@
 /*   By: sichoi <sichoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 18:34:37 by sichoi            #+#    #+#             */
-/*   Updated: 2022/05/20 21:21:01 by swi              ###   ########.fr       */
+/*   Updated: 2022/05/21 12:02:35 by swi              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int	len_n(int n)
+static int	len_n(int n)
 {
 	int	i;
 
@@ -27,7 +27,7 @@ int	len_n(int n)
 	return (i);
 }
 
-char	*tr_str(int n, char *s, int len)
+static char	*tr_str(int n, char *s, int len)
 {
 	int	i;
 
